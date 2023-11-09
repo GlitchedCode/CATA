@@ -1,0 +1,44 @@
+[gd_scene load_steps=3 format=3 uid="uid://jhdn00vqr61s"]
+
+[ext_resource type="Script" path="res://UI/SimulationView.cs" id="1_8jc25"]
+[ext_resource type="Script" path="res://main.cs" id="1_kxxwb"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kxxwb")
+
+[node name="Previous" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 52.0
+offset_top = 46.0
+offset_right = -649.0
+offset_bottom = -141.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8jc25")
+
+[node name="Current" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 313.0
+offset_top = 40.0
+offset_right = -388.0
+offset_bottom = -147.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8jc25")
+deadColor = Color(0.145098, 0.25098, 0.133333, 1)
+
+[node name="TurnTimer" type="Timer" parent="."]
+wait_time = 2.0
+autostart = true
