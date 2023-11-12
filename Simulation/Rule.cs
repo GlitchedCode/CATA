@@ -5,6 +5,8 @@ public struct Rule
     public uint Bits { get; private set; } = 0;
     public uint KnownBits { get; private set; } = 0;
 
+    public Neighborhood Neighborhood {get; private set;} = new VonNeumann();
+
     public Rule() { }
 
     public Rule(uint bits)

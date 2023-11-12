@@ -21,7 +21,7 @@ public class Simulation
             for (int c = 0; c < state.Columns; ++c)
             {
                 // von neumann
-                var neighborhood = VonNeumann(previousState.GetView(), r, c);
+                var neighborhood = Rule.Neighborhood.Get(previousState.GetView(), r, c);
                 state.Set(r, c, Rule.GetNeighborhoodNext(neighborhood));
             }
     }
@@ -43,15 +43,4 @@ public class Simulation
 
     public Grid2DView<bool> GetCurrentStateView() => state.GetView();
     public Grid2DView<bool> GetPreviousStateView() => previousState.GetView();
-
-    public static bool[] VonNeumann(Grid2DView<bool> state, int r, int c)
-    {
-        bool[] neighborhood = { false, false, false, false, false };
-        neighborhood[0] = state.Get(r, c);
-        neighborhood[1] = state.Get(r - 1, c);
-        neighborhood[2] = state.Get(r, c + 1);
-        neighborhood[3] = state.Get(r, c - 1);
-        neighborhood[4] = state.Get(r + 1, c);
-        return neighborhood;
-    }
 }
