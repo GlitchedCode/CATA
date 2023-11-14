@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Simulation;
 
 public partial class SimulationView : Control
 {

@@ -1,0 +1,8 @@
+{
+    "fileOptions" : {
+        "excludeSearchPatterns" : [
+            ".godot"
+        ]
+    },
+    "enableAnalyzersSupport" : false
+}

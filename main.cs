@@ -1,51 +1,76 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Simulation;
 
 public partial class main : Control
 {
-    SimulationView currentView, previousView;
+    SimulationView originalView, recreatedView;
 
-    Simulation simulation;
+    Model originalSimulation, recreatedSimulation;
     List<Grid2DView<bool>> states = new();
 
-    Label chosenLabel, predictedLabel;
+    Label diffLabel;
 
     public override void _Ready()
     {
-        GetNode<Timer>("TurnTimer").Timeout += onTurnTimeout;
-        currentView = GetNode<SimulationView>("Current");
-        previousView = GetNode<SimulationView>("Previous");
+        GetNode<Godot.Timer>("TurnTimer").Timeout += onTurnTimeout;
+        originalView = GetNode<SimulationView>("Original");
+        recreatedView = GetNode<SimulationView>("Recreated");
 
-        chosenLabel = GetNode<Label>("labels/rules/chosen");
-        predictedLabel = GetNode<Label>("labels/rules/predicted");
+        diffLabel = GetNode<Label>("labels/rules/difference");
 
-        simulation = new(40, 40);
-        simulation.Randomize();
-        simulation.Rule = Rule.Random();
-        chosenLabel.Text = $"chosen: {simulation.Rule.Bits}";
+        originalSimulation = new(40, 40);
+        originalSimulation.Randomize();
+        originalSimulation.Rule = Rule.Random();
 
-        states.Add(simulation.GetCurrentStateView());
+        recreatedSimulation = new(40, 40);
+
+        Console.WriteLine($"diff before analyze: {originalSimulation.Rule.Difference(recreatedSimulation.Rule)}");
+
+        states.Add(originalSimulation.GetCurrentStateView());
         Advance();
     }
 
     void onTurnTimeout()
     {
         Advance();
-        if (states.Count == 5)
+        if (states != null && states.Count == 20)
         {
             var predicted = Analyzer.Analyze(states.ToArray());
-            predictedLabel.Text = $"predicted: {predicted.Bits}";
+            recreatedSimulation.Rule = predicted;
+            originalSimulation.Randomize();
+            recreatedSimulation.ResetState(originalSimulation.GetCurrentStateView());
+            diffLabel.Text = $"difference: {predicted.Difference(originalSimulation.Rule)}";
+            states = null;
+
+
+            void print(Rule r)
+            {
+                foreach (var config in r.ConfigurationKeys)
+                {
+                    Console.Write(config.GetHashCode());
+                    Console.Write(" ");
+                    Console.WriteLine(string.Join(" ", r.Distribution(config)));
+                }
+            }
+
+            Console.WriteLine("original");
+            print(originalSimulation.Rule);
+            Console.WriteLine("recreated");
+            print(recreatedSimulation.Rule);
         }
     }
 
     public void Advance()
     {
-        simulation.Advance();
-        var view = simulation.GetCurrentStateView();
-        currentView.SetState(view);
-        previousView.SetState(simulation.GetPreviousStateView());
-        states.Add(view);
+        originalSimulation.Advance();
+        recreatedSimulation.Advance();
+
+        var view = originalSimulation.GetCurrentStateView();
+        originalView.SetState(view);
+        recreatedView.SetState(recreatedSimulation.GetCurrentStateView());
+        if (states != null) states.Add(view);
     }
 
 

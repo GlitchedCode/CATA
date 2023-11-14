@@ -12,22 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kxxwb")
 
-[node name="Previous" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 52.0
-offset_top = 46.0
-offset_right = -649.0
-offset_bottom = -141.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("1_8jc25")
-deadColor = Color(0.141176, 0.0784314, 0.25098, 1)
-aliveColor = Color(0.772549, 0.72549, 0.278431, 1)
-
-[node name="Current" type="Control" parent="."]
+[node name="Original" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -42,8 +27,23 @@ script = ExtResource("1_8jc25")
 deadColor = Color(0.141176, 0.0784314, 0.25098, 1)
 aliveColor = Color(0.772549, 0.72549, 0.278431, 1)
 
+[node name="Recreated" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 52.0
+offset_top = 46.0
+offset_right = -649.0
+offset_bottom = -141.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8jc25")
+deadColor = Color(0.141176, 0.0784314, 0.25098, 1)
+aliveColor = Color(0.772549, 0.72549, 0.278431, 1)
+
 [node name="TurnTimer" type="Timer" parent="."]
-wait_time = 0.2
+wait_time = 0.5
 autostart = true
 
 [node name="labels" type="Control" parent="."]
@@ -53,6 +53,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_lock_ = true
 
 [node name="static" type="Control" parent="labels"]
 layout_mode = 1
@@ -61,40 +62,33 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_lock_ = true
 
 [node name="Label" type="Label" parent="labels/static"]
 layout_mode = 0
-offset_left = 213.0
-offset_top = 559.0
-offset_right = 280.0
-offset_bottom = 585.0
-text = "previous"
+offset_left = 731.0
+offset_top = 563.0
+offset_right = 798.0
+offset_bottom = 589.0
+text = "original"
 
 [node name="Label2" type="Label" parent="labels/static"]
 layout_mode = 0
-offset_left = 778.0
-offset_top = 566.0
-offset_right = 836.0
-offset_bottom = 592.0
-text = "current"
+offset_left = 153.0
+offset_top = 564.0
+offset_right = 228.0
+offset_bottom = 590.0
+text = "recreated"
 
 [node name="rules" type="Control" parent="labels"]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="chosen" type="Label" parent="labels/rules"]
+[node name="difference" type="Label" parent="labels/rules"]
 layout_mode = 0
-offset_left = 62.0
-offset_top = 22.0
-offset_right = 256.0
-offset_bottom = 48.0
-text = "Chosen: 10001229310923"
-
-[node name="predicted" type="Label" parent="labels/rules"]
-layout_mode = 0
-offset_left = 763.0
-offset_top = 29.0
-offset_right = 974.0
-offset_bottom = 55.0
-text = "Predicted: not yet"
+offset_left = 399.0
+offset_top = 32.0
+offset_right = 610.0
+offset_bottom = 58.0
+text = "difference: wait a sec"

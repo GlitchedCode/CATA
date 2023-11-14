@@ -1,6 +1,9 @@
+namespace Simulation;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+
 
 public class Grid2DContainer<T>
 {
