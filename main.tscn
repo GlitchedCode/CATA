@@ -43,7 +43,7 @@ deadColor = Color(0.141176, 0.0784314, 0.25098, 1)
 aliveColor = Color(0.772549, 0.72549, 0.278431, 1)
 
 [node name="TurnTimer" type="Timer" parent="."]
-wait_time = 0.5
+wait_time = 0.2
 autostart = true
 
 [node name="labels" type="Control" parent="."]

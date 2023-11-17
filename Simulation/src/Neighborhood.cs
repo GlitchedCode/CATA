@@ -46,6 +46,8 @@ public abstract class Neighborhood
     public abstract uint Count();
     public abstract T[] Get<T>(Grid2DView<T> state, int row, int column);
 
+    public abstract ConfigurationKey ConvertKey(ConfigurationKey input);
+
     public static ConfigurationKey Encode(bool[] neighborhood)
     {
         byte[] buf = new byte[(neighborhood.Length / 8) + 1];
@@ -105,7 +107,7 @@ public class VonNeumann : Neighborhood
     public override uint Count()
     {
         uint ret = 1 + (Radius * 4);
-        for (uint i = 1; i < Radius; i++) ret += i;
+        for (uint i = 1; i < Radius; i++) ret += i * 4;
         return ret;
     }
 
@@ -116,34 +118,44 @@ public class VonNeumann : Neighborhood
 
         neighborhood[0] = state.Get(row, column);
         int idx = 1;
-        // cross
-        for (int i = 1; i <= Radius; i++)
-        {
-            neighborhood[idx] = state.Get(row + i, column);
-            idx++;
-            neighborhood[idx] = state.Get(row - i, column);
-            idx++;
-            neighborhood[idx] = state.Get(row, column + i);
-            idx++;
-            neighborhood[idx] = state.Get(row, column - i);
-            idx++;
-        }
 
-        // quadrants
-        for (int c = 1; c < Radius; c++)
-            for (int r = c - (int)Radius; r < 0; r++)
+        for (int i = 1; i <= Radius; i++)
+            for (int j = 0; j < i; j++)
             {
+                var r = -i + j;
+                var c = j;
                 neighborhood[idx] = state.Get(row + r, column + c);
                 idx++;
-                neighborhood[idx] = state.Get(row + r, column - c);
+
+                neighborhood[idx] = state.Get(row + c, column - r);
                 idx++;
-                neighborhood[idx] = state.Get(row - r, column + c);
-                idx++;
+
                 neighborhood[idx] = state.Get(row - r, column - c);
+                idx++;
+
+                neighborhood[idx] = state.Get(row - c, column + r);
                 idx++;
             }
 
+
         return neighborhood;
     }
-}
 
+    public T[] Convert<T>(T[] input, T defaultValue)
+    {
+        var count = Count();
+        T[] ret = Enumerable.Repeat(defaultValue, (int)count).ToArray();
+        Array.Copy(input, 0, ret, 0, input.Length);
+        return ret;
+    }
+
+    public override ConfigurationKey ConvertKey(ConfigurationKey input)
+    {
+        var config = Enumerable.Repeat(false, (int)Count()).ToArray();
+        var ret = Neighborhood.Encode(config);
+
+        Array.Copy(input.Bytes, 0, ret.Bytes, 0, Math.Min(input.Bytes.Length, ret.Bytes.Length));
+
+        return ret;
+    }
+}

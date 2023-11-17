@@ -12,6 +12,8 @@ public partial class main : Control
 
     Label diffLabel;
 
+    [Export] VideoStream targetVideo;
+
     public override void _Ready()
     {
         GetNode<Godot.Timer>("TurnTimer").Timeout += onTurnTimeout;
@@ -20,28 +22,49 @@ public partial class main : Control
 
         diffLabel = GetNode<Label>("labels/rules/difference");
 
-        originalSimulation = new(40, 40);
+        originalSimulation = new(100, 100);
         originalSimulation.Randomize();
-        originalSimulation.Rule = Rule.Random();
+        originalSimulation.Rule = Rule.Random(new VonNeumann(1));
 
-        recreatedSimulation = new(40, 40);
+        recreatedSimulation = new(100, 100);
 
-        Console.WriteLine($"diff before analyze: {originalSimulation.Rule.Difference(recreatedSimulation.Rule)}");
 
         states.Add(originalSimulation.GetCurrentStateView());
         Advance();
+
+    }
+
+    void AnalyzeVideo()
+    {
+        const int FRAMERATE = 10;
+        const double eps = 10e-2;
+        var player = targetVideo._InstantiatePlayback();
+        var frames = player._GetLength() / FRAMERATE;
+
+        player._Seek(0);
+        var size = player._GetTexture().GetImage().GetSize();
+
+
+        for (int frame = 0; frame < frames; frame++)
+        {
+            player._Seek(((double)frame / (double)FRAMERATE) + eps);
+            var img = player._GetTexture().GetImage();
+        }
     }
 
     void onTurnTimeout()
     {
         Advance();
-        if (states != null && states.Count == 20)
+        if (states != null && states.Count == 5)
         {
+            var originalRule = originalSimulation.Rule;
+            Console.WriteLine($"diff before analyze: {originalRule.AverageDifference(recreatedSimulation.Rule)}");
             var predicted = Analyzer.Analyze(states.ToArray());
             recreatedSimulation.Rule = predicted;
+            Console.WriteLine($"diff after analyze: {recreatedSimulation.Rule.AverageDifference(originalRule)}");
             originalSimulation.Randomize();
             recreatedSimulation.ResetState(originalSimulation.GetCurrentStateView());
-            diffLabel.Text = $"difference: {predicted.Difference(originalSimulation.Rule)}";
+            diffLabel.Text = $"difference: {recreatedSimulation.Rule.AverageDifference(originalRule)}";
             states = null;
 
 
@@ -57,6 +80,9 @@ public partial class main : Control
 
             Console.WriteLine("original");
             print(originalSimulation.Rule);
+            Console.WriteLine(" ");
+            Console.WriteLine(" ");
+            Console.WriteLine(" ");
             Console.WriteLine("recreated");
             print(recreatedSimulation.Rule);
         }

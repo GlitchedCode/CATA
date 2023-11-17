@@ -140,20 +140,25 @@ public struct Rule
 
     public double Variance() => 0;
 
-    public double Difference(Rule other)
+    public double AverageDifference(Rule other)
     {
         var ret = 0d;
+        var count = 0d;
 
         foreach (var key in ConfigurationKeys)
         {
             var thisDist = Distribution(key);
-            var otherDist = other.Distribution(key);
+
+            var otherKey = other.Neighborhood.ConvertKey(key);
+            var otherDist = other.Distribution(otherKey);
 
             ret += Math.Abs(thisDist[0] - otherDist[0]);
             ret += Math.Abs(thisDist[1] - otherDist[1]);
+
+            count += 1d;
         }
 
-        return ret;
+        return ret / count;
     }
 
     public static Rule Random(Neighborhood neighborhood = null, Random rng = null)
