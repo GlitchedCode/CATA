@@ -8,7 +8,7 @@ public partial class main : Control
     SimulationView originalView, recreatedView;
 
     Model originalSimulation, recreatedSimulation;
-    List<Grid2DView<bool>> states = new();
+    List<Grid2DView<bool>> states;
 
     Label diffLabel;
 
@@ -23,18 +23,27 @@ public partial class main : Control
         diffLabel = GetNode<Label>("labels/rules/difference");
 
         originalSimulation = new(100, 100);
-        originalSimulation.Randomize();
+        //originalSimulation.Randomize();
         originalSimulation.Rule = Rule.Random(new VonNeumann(1));
 
         recreatedSimulation = new(100, 100);
 
 
-        states.Add(originalSimulation.GetCurrentStateView());
-        Advance();
 
+        if (targetVideo != null)
+        {
+            originalSimulation.Rule = AnalyzeVideo();
+        }
+        else
+        {
+            states = new();
+            states.Add(originalSimulation.GetCurrentStateView());
+        }
+
+        Advance();
     }
 
-    void AnalyzeVideo()
+    Rule AnalyzeVideo()
     {
         const int FRAMERATE = 10;
         const double eps = 10e-2;
@@ -44,12 +53,25 @@ public partial class main : Control
         player._Seek(0);
         var size = player._GetTexture().GetImage().GetSize();
 
+        List<Grid2DView<bool>> timeSeries = new();
 
         for (int frame = 0; frame < frames; frame++)
         {
             player._Seek(((double)frame / (double)FRAMERATE) + eps);
             var img = player._GetTexture().GetImage();
+            var grid = new Grid2DContainer<bool>(size.Y, size.X, false);
+
+            for (int x = 0; x < size.X; x++)
+                for (int y = 0; y < size.Y; y++)
+                {
+                    var value = img.GetPixel(x, y).R > 0.5;
+                    grid.Set(y, x, value);
+                }
+
+            timeSeries.Add(grid.GetView());
         }
+
+        return Analyzer.Analyze(timeSeries.ToArray());
     }
 
     void onTurnTimeout()

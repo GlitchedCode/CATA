@@ -16,7 +16,7 @@ public class Analyzer
         var columns = dynamics[0].Columns;
 
         Rule ret = new();
-        var neighborhood = new VonNeumann();
+        var neighborhood = new VonNeumann(2);
         neighborhood.Radius = 1;
         ret.Neighborhood = neighborhood;
 
