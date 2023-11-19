@@ -71,8 +71,8 @@ public struct Rule
     Dictionary<ConfigurationKey, BinaryStateCounter> stateTable = new();
     public bool DefaultValue = false;
 
-    private Neighborhood __neighborhood = new VonNeumann();
-    public Neighborhood Neighborhood
+    private Neighborhood<bool> __neighborhood = new VonNeumann<bool>(false);
+    public Neighborhood<bool> Neighborhood
     {
         get => __neighborhood;
         set
@@ -161,15 +161,15 @@ public struct Rule
         return ret / count;
     }
 
-    public static Rule Random(Neighborhood neighborhood = null, Random rng = null)
+    public static Rule Random(Neighborhood<bool> neighborhood = null, Random rng = null)
     {
         if (rng == null) rng = new Random();
-        if (neighborhood == null) neighborhood = new VonNeumann();
+        if (neighborhood == null) neighborhood = new VonNeumann<bool>(false);
 
         var ret = new Rule();
         ret.Neighborhood = neighborhood;
 
-        foreach (var config in Neighborhood.EnumerateBooleanConfigurations(neighborhood))
+        foreach (var config in neighborhood.EnumerateConfigurations())
         {
             if (rng.Next(2) == 0)
                 ret.Set(config, rng.Next(2) == 0);

@@ -16,7 +16,7 @@ public class Analyzer
         var columns = dynamics[0].Columns;
 
         Rule ret = new();
-        var neighborhood = new VonNeumann(2);
+        var neighborhood = new VonNeumann<bool>(false, 2);
         neighborhood.Radius = 1;
         ret.Neighborhood = neighborhood;
 
@@ -29,7 +29,7 @@ public class Analyzer
                 for (int c = 0; c < columns; ++c)
                 {
                     var configuration = ret.Neighborhood.Get(current, r, c);
-                    var configKey = Neighborhood.Encode(configuration);
+                    var configKey = ret.Neighborhood.Encode(configuration);
 
                     var expected = next.Get(r, c);
                     ret.Increment(configKey, expected);

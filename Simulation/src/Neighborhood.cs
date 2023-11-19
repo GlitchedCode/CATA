@@ -41,22 +41,30 @@ public class ConfigurationKey
 }
 
 
-public abstract class Neighborhood
+public abstract class Neighborhood<T>
 {
     public abstract uint Count();
-    public abstract T[] Get<T>(Grid2DView<T> state, int row, int column);
+    public abstract T[] Get(Grid2DView<T> state, int row, int column);
 
     public abstract ConfigurationKey ConvertKey(ConfigurationKey input);
 
-    public static ConfigurationKey Encode(bool[] neighborhood)
+    public ConfigurationKey Encode(T[] configuration)
     {
-        byte[] buf = new byte[(neighborhood.Length / 8) + 1];
+        if (configuration is bool[])
+            return EncodeBool(configuration as bool[]);
+
+        return null;
+    }
+
+    public static ConfigurationKey EncodeBool(bool[] configuration)
+    {
+        byte[] buf = new byte[(configuration.Length / 8) + 1];
         for (int i = 0; i < buf.Length; i++)
             buf[i] = 0;
 
-        for (int i = 0; i < neighborhood.Length; i++)
+        for (int i = 0; i < configuration.Length; i++)
         {
-            if (neighborhood[i])
+            if (configuration[i])
             {
                 int bufIdx = i / 8;
                 int bitIdx = i % 8;
@@ -68,7 +76,19 @@ public abstract class Neighborhood
         return new ConfigurationKey(buf);
     }
 
-    public static IEnumerable<ConfigurationKey> EnumerateBooleanConfigurations(Neighborhood neighborhood)
+    public IEnumerable<ConfigurationKey> EnumerateConfigurations()
+    {
+        if (this is Neighborhood<bool>)
+        {
+            foreach (var k in EnumerateBooleanConfigurations(this as Neighborhood<bool>))
+                yield return k;
+        }
+
+
+        yield break;
+    }
+
+    public static IEnumerable<ConfigurationKey> EnumerateBooleanConfigurations(Neighborhood<bool> neighborhood)
     {
         var config = new bool[neighborhood.Count()];
 
@@ -76,7 +96,7 @@ public abstract class Neighborhood
         {
             if (idx < 0)
             {
-                yield return Encode(config);
+                yield return neighborhood.Encode(config);
                 yield break;
             }
 
@@ -98,11 +118,16 @@ public abstract class Neighborhood
 }
 
 
-public class VonNeumann : Neighborhood
+public class VonNeumann<T> : Neighborhood<T>
 {
     public uint Radius = 1;
+    public T DefaultValue;
 
-    public VonNeumann(uint radius = 1) => this.Radius = radius;
+    public VonNeumann(T defaultValue, uint radius = 1)
+    {
+        this.DefaultValue = defaultValue;
+        this.Radius = radius;
+    }
 
     public override uint Count()
     {
@@ -111,7 +136,7 @@ public class VonNeumann : Neighborhood
         return ret;
     }
 
-    public override T[] Get<T>(Grid2DView<T> state, int row, int column)
+    public override T[] Get(Grid2DView<T> state, int row, int column)
     {
         var count = Count();
         T[] neighborhood = new T[count];
@@ -141,7 +166,7 @@ public class VonNeumann : Neighborhood
         return neighborhood;
     }
 
-    public T[] Convert<T>(T[] input, T defaultValue)
+    public T[] Convert(T[] input, T defaultValue)
     {
         var count = Count();
         T[] ret = Enumerable.Repeat(defaultValue, (int)count).ToArray();
@@ -151,8 +176,8 @@ public class VonNeumann : Neighborhood
 
     public override ConfigurationKey ConvertKey(ConfigurationKey input)
     {
-        var config = Enumerable.Repeat(false, (int)Count()).ToArray();
-        var ret = Neighborhood.Encode(config);
+        var config = Enumerable.Repeat(DefaultValue, (int)Count()).ToArray();
+        var ret = Encode(config);
 
         Array.Copy(input.Bytes, 0, ret.Bytes, 0, Math.Min(input.Bytes.Length, ret.Bytes.Length));
 

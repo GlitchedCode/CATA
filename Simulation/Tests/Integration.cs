@@ -12,12 +12,12 @@ public class IntegrationTest
     {
         var rng = new Random();
         var rule = new Rule();
-        rule.Neighborhood = new VonNeumann(1);
+        rule.Neighborhood = new VonNeumann<bool>(false, 1);
 
         var config = new bool[] { false, false, false, false, false };
         Assert.Equal((int)rule.Neighborhood.Count(), config.Length);
 
-        var configKey = Neighborhood.Encode(config);
+        var configKey = rule.Neighborhood.Encode(config);
 
         for (int i = 0; i < samples; i++)
             rule.Increment(configKey, rng.NextDouble() < trueProbability);

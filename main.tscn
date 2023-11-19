@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://jhdn00vqr61s"]
+[gd_scene load_steps=4 format=3 uid="uid://jhdn00vqr61s"]
 
 [ext_resource type="Script" path="res://UI/SimulationView.cs" id="1_8jc25"]
 [ext_resource type="Script" path="res://main.cs" id="1_kxxwb"]
+[ext_resource type="SpriteFrames" uid="uid://25qlnkfxlpk1" path="res://Source Videos/result_reg.tres" id="2_pxfgf"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -11,6 +12,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kxxwb")
+targetFrames = ExtResource("2_pxfgf")
 
 [node name="Original" type="Control" parent="."]
 layout_mode = 1
@@ -18,9 +20,9 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 313.0
-offset_top = 40.0
+offset_top = 45.0
 offset_right = -388.0
-offset_bottom = -147.0
+offset_bottom = -142.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_8jc25")
@@ -87,8 +89,8 @@ offset_bottom = 40.0
 
 [node name="difference" type="Label" parent="labels/rules"]
 layout_mode = 0
-offset_left = 399.0
-offset_top = 32.0
-offset_right = 610.0
-offset_bottom = 58.0
+offset_left = 398.0
+offset_top = 20.0
+offset_right = 609.0
+offset_bottom = 46.0
 text = "difference: wait a sec"

@@ -9,10 +9,10 @@ public class NeighborhoodTests
     [InlineData(3.03)]
     public void VonNeumannBoolConfigurations(uint radius)
     {
-        var neighborhood = new VonNeumann(radius);
+        var neighborhood = new VonNeumann<bool>(false, radius);
         List<ConfigurationKey> configs = new();
 
-        foreach (var k in Neighborhood.EnumerateBooleanConfigurations(neighborhood))
+        foreach (var k in neighborhood.EnumerateConfigurations())
             configs.Add(k);
 
         Assert.Equal(configs.Count, Math.Pow(2, (int)neighborhood.Count()));

@@ -8,23 +8,25 @@ public class Model
     Grid2DContainer<bool> state;
     Grid2DContainer<bool> previousState;
 
+    public bool DefaultState = false;
+
     public Model(int rows, int cols)
     {
         Rule = new();
-        state = new(rows, cols, false);
-        previousState = new(rows, cols, false);
+        state = new(rows, cols, DefaultState);
+        previousState = new(rows, cols, DefaultState);
     }
 
     public void Advance()
     {
         previousState = state;
-        state = new(previousState.Rows, previousState.Columns, false);
+        state = new(previousState.Rows, previousState.Columns, DefaultState);
         for (int r = 0; r < state.Rows; ++r)
             for (int c = 0; c < state.Columns; ++c)
             {
                 // von neumann
                 var configuration = Rule.Neighborhood.Get(previousState.GetView(), r, c);
-                var configKey = Neighborhood.Encode(configuration);
+                var configKey = Rule.Neighborhood.Encode(configuration);
                 state.Set(r, c, Rule.Get(configKey));
             }
     }
@@ -35,7 +37,7 @@ public class Model
 
         for (int r = 0; r < state.Rows; ++r)
             for (int c = 0; c < state.Columns; ++c)
-                state.Set(r, c, (rng.Next() % 3) == 0);
+                state.Set(r, c, (rng.Next() % 4) == 0);
     }
 
     public void Set(int row, int column, bool state)

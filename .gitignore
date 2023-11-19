@@ -14,3 +14,6 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+
+
+**.import
