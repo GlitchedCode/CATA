@@ -5,29 +5,29 @@ using System;
 public class Model
 {
     public Rule Rule;
-    Grid2DContainer<bool> state;
-    Grid2DContainer<bool> previousState;
+    Grid2DContainer<State> gridState;
+    Grid2DContainer<State> previousGridState;
 
-    public bool DefaultState = false;
+    public State DefaultState = new State(1, 0);
 
     public Model(int rows, int cols)
     {
-        Rule = new();
-        state = new(rows, cols, DefaultState);
-        previousState = new(rows, cols, DefaultState);
+        Rule = new(2);
+        gridState = new(rows, cols, DefaultState);
+        previousGridState = new(rows, cols, DefaultState);
     }
 
     public void Advance()
     {
-        previousState = state;
-        state = new(previousState.Rows, previousState.Columns, DefaultState);
-        for (int r = 0; r < state.Rows; ++r)
-            for (int c = 0; c < state.Columns; ++c)
+        previousGridState = gridState;
+        gridState = new(previousGridState.Rows, previousGridState.Columns, DefaultState);
+        for (int r = 0; r < gridState.Rows; ++r)
+            for (int c = 0; c < gridState.Columns; ++c)
             {
                 // von neumann
-                var configuration = Rule.Neighborhood.Get(previousState.GetView(), r, c);
-                var configKey = Rule.Neighborhood.Encode(configuration);
-                state.Set(r, c, Rule.Get(configKey));
+                var configuration = Rule.Neighborhood.Get(previousGridState.GetView(), r, c);
+                var configKey = Neighborhood.Encode(configuration);
+                gridState.Set(r, c, Rule.Get(configKey));
             }
     }
 
@@ -35,17 +35,17 @@ public class Model
     {
         Random rng = new Random();
 
-        for (int r = 0; r < state.Rows; ++r)
-            for (int c = 0; c < state.Columns; ++c)
-                state.Set(r, c, (rng.Next() % 4) == 0);
+        for (int r = 0; r < gridState.Rows; ++r)
+            for (int c = 0; c < gridState.Columns; ++c)
+                gridState.Set(r, c, new State(Rule.BitsCount, rng.Next(Rule.StatesCount)));
     }
 
-    public void Set(int row, int column, bool state)
-        => this.state.Set(row, column, state);
+    public void Set(int row, int column, State state)
+        => this.gridState.Set(row, column, state);
 
-    public void ResetState(Grid2DView<bool> state = null)
+    public void ResetState(Grid2DView<State> state = null)
     {
-        var nullState = (int r, int c) => false;
+        var nullState = (int r, int c) => new State(Rule.BitsCount, 0);
         var okState = (int r, int c) => state.Get(r, c);
         var getState = state == null ? nullState : okState;
 
@@ -56,11 +56,11 @@ public class Model
 
     public void Resize(int rows, int cols)
     {
-        state.Resize(rows, cols);
-        previousState.Resize(rows, cols);
+        gridState.Resize(rows, cols);
+        previousGridState.Resize(rows, cols);
     }
 
-    public Grid2DView<bool> GetCurrentStateView() => state.GetView();
-    public Grid2DView<bool> GetPreviousStateView() => previousState.GetView();
+    public Grid2DView<State> GetCurrentStateView() => gridState.GetView();
+    public Grid2DView<State> GetPreviousStateView() => previousGridState.GetView();
 }
 

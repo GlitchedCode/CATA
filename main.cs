@@ -8,7 +8,7 @@ public partial class main : Control
     SimulationView originalView, recreatedView;
 
     Model originalSimulation, recreatedSimulation;
-    List<Grid2DView<bool>> states;
+    List<Grid2DView<State>> gridStates;
 
     Label diffLabel;
 
@@ -35,9 +35,9 @@ public partial class main : Control
         }
         else
         {
-            states = new();
-            states.Add(originalSimulation.GetCurrentStateView());
-            originalSimulation.Rule = Rule.Random(new VonNeumann<bool>(false, 1));
+            gridStates = new();
+            gridStates.Add(originalSimulation.GetCurrentStateView());
+            originalSimulation.Rule = RandomRule.Make(new VonNeumann(1), 2);
         }
 
         Advance();
@@ -48,18 +48,18 @@ public partial class main : Control
         var frames = targetFrames.GetFrameCount("default");
         var size = targetFrames.GetFrameTexture("default", 0).GetImage().GetSize();
 
-        List<Grid2DView<bool>> timeSeries = new();
+        List<Grid2DView<State>> timeSeries = new();
 
         for (int frame = 0; frame < frames; frame++)
         {
             var img = targetFrames.GetFrameTexture("default", frame).GetImage();
-            var grid = new Grid2DContainer<bool>(size.Y, size.X, false);
+            var grid = new Grid2DContainer<State>(size.Y, size.X, new State(1, 0));
 
             for (int x = 0; x < size.X; x++)
                 for (int y = 0; y < size.Y; y++)
                 {
                     var value = img.GetPixel(x, y).R > 0.7;
-                    grid.Set(y, x, value);
+                    grid.Set(y, x, new State(1, value ? 1 : 0));
                 }
 
             timeSeries.Add(grid.GetView());
@@ -71,17 +71,17 @@ public partial class main : Control
     void onTurnTimeout()
     {
         Advance();
-        if (states != null && states.Count == 5)
+        if (gridStates != null && gridStates.Count == 5)
         {
             var originalRule = originalSimulation.Rule;
             Console.WriteLine($"diff before analyze: {originalRule.AverageDifference(recreatedSimulation.Rule)}");
-            var predicted = Analyzer.Analyze(states.ToArray());
+            var predicted = Analyzer.Analyze(gridStates.ToArray());
             recreatedSimulation.Rule = predicted;
             Console.WriteLine($"diff after analyze: {recreatedSimulation.Rule.AverageDifference(originalRule)}");
             originalSimulation.Randomize();
             recreatedSimulation.ResetState(originalSimulation.GetCurrentStateView());
             diffLabel.Text = $"difference: {recreatedSimulation.Rule.AverageDifference(originalRule)}";
-            states = null;
+            gridStates = null;
 
 
             void print(Rule r)
@@ -112,7 +112,7 @@ public partial class main : Control
         var view = originalSimulation.GetCurrentStateView();
         originalView.SetState(view);
         recreatedView.SetState(recreatedSimulation.GetCurrentStateView());
-        if (states != null) states.Add(view);
+        if (gridStates != null) gridStates.Add(view);
     }
 
 

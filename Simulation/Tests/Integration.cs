@@ -11,24 +11,24 @@ public class IntegrationTest
     public void TestBoolDistribution(double trueProbability, uint samples, double eps)
     {
         var rng = new Random();
-        var rule = new Rule();
-        rule.Neighborhood = new VonNeumann<bool>(false, 1);
+        var rule = new Rule(2);
+        rule.Neighborhood = new VonNeumann(1);
 
-        var config = new bool[] { false, false, false, false, false };
+        var config = Enumerable.Range(1, 5).Select(_ => new State(1, 0)).ToArray();
         Assert.Equal((int)rule.Neighborhood.Count(), config.Length);
 
-        var configKey = rule.Neighborhood.Encode(config);
+        var configKey = Neighborhood.Encode(config);
 
         for (int i = 0; i < samples; i++)
-            rule.Increment(configKey, rng.NextDouble() < trueProbability);
+            rule.Increment(configKey, rng.NextDouble() < trueProbability ? 1 : 0);
 
-        Assert.InRange(rule.Distribution(configKey)[0], trueProbability - eps, trueProbability + eps);
+        Assert.InRange(rule.Distribution(configKey)[1], trueProbability - eps, trueProbability + eps);
 
-        var counters = new int[2]{0,0};
+        var counters = new int[2] { 0, 0 };
         for (int i = 0; i < samples; i++)
-            counters[rule.Get(configKey) ? 0 : 1]++;
+            counters[rule.Get(configKey).Value]++;
 
-        var ratio = (double)counters[0] / (double)(counters[0] + counters[1]);
+        var ratio = (double)counters[1] / (double)(counters[0] + counters[1]);
         Assert.InRange(ratio, trueProbability - eps, trueProbability + eps);
     }
 }

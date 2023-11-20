@@ -5,18 +5,18 @@ using System;
 
 public class Analyzer
 {
-    public static bool Validate(Rule rule, Grid2DView<bool>[] dynamics)
+    public static bool Validate(Rule rule, Grid2DView<State>[] dynamics)
     {
         return false;
     }
 
-    public static Rule Analyze(Grid2DView<bool>[] dynamics)
+    public static Rule Analyze(Grid2DView<State>[] dynamics)
     {
         var rows = dynamics[0].Rows;
         var columns = dynamics[0].Columns;
 
-        Rule ret = new();
-        var neighborhood = new VonNeumann<bool>(false, 2);
+        Rule ret = new(2);
+        var neighborhood = new VonNeumann(1);
         neighborhood.Radius = 1;
         ret.Neighborhood = neighborhood;
 
@@ -29,10 +29,10 @@ public class Analyzer
                 for (int c = 0; c < columns; ++c)
                 {
                     var configuration = ret.Neighborhood.Get(current, r, c);
-                    var configKey = ret.Neighborhood.Encode(configuration);
+                    var configKey = Neighborhood.Encode(configuration);
 
                     var expected = next.Get(r, c);
-                    ret.Increment(configKey, expected);
+                    ret.Increment(configKey, expected.Value);
                 }
         }
 

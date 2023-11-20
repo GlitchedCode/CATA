@@ -7,7 +7,7 @@ public struct CompactRule
     public uint Bits { get; private set; } = 0;
     public uint KnownBits { get; private set; } = 0;
 
-    public Neighborhood<bool> Neighborhood { get; private set; } = new VonNeumann<bool>(false);
+    public Neighborhood Neighborhood { get; private set; } = new VonNeumann();
 
     public CompactRule() { }
 

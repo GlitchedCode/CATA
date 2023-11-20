@@ -6,13 +6,13 @@ public class NeighborhoodTests
     [Theory]
     [InlineData(1)]
     [InlineData(2)]
-    [InlineData(3.03)]
+    [InlineData(3)]
     public void VonNeumannBoolConfigurations(uint radius)
     {
-        var neighborhood = new VonNeumann<bool>(false, radius);
+        var neighborhood = new VonNeumann(radius);
         List<ConfigurationKey> configs = new();
 
-        foreach (var k in neighborhood.EnumerateConfigurations())
+        foreach (var k in neighborhood.EnumerateConfigurations(2))
             configs.Add(k);
 
         Assert.Equal(configs.Count, Math.Pow(2, (int)neighborhood.Count()));
