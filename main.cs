@@ -45,6 +45,10 @@ public partial class main : Control
 
     Rule AnalyzeVideo()
     {
+        var stateCount = 4;
+        var bitCount = (int)Math.Ceiling(Math.Log2(stateCount));
+        var stateWidth = 1d / (double)stateCount;
+
         var frames = targetFrames.GetFrameCount("default");
         var size = targetFrames.GetFrameTexture("default", 0).GetImage().GetSize();
 
@@ -58,14 +62,20 @@ public partial class main : Control
             for (int x = 0; x < size.X; x++)
                 for (int y = 0; y < size.Y; y++)
                 {
-                    var value = img.GetPixel(x, y).R > 0.7;
-                    grid.Set(y, x, new State(1, value ? 1 : 0));
+                    var value = img.GetPixel(x, y).R;
+                    var state = Math.Clamp((int)Math.Floor(value / stateWidth), 0, stateCount - 1);
+                    grid.Set(y, x, new State(bitCount, state));
                 }
 
             timeSeries.Add(grid.GetView());
         }
 
-        return Analyzer.Analyze(timeSeries.ToArray());
+        var ruleTimeSeries = Analyzer.TimeSeries(timeSeries.ToArray(), stateCount);
+
+        var ret = ruleTimeSeries[0];
+        return ruleTimeSeries.Skip(0).Aggregate(ret,
+                                                (x, y) => x + y,
+                                                r => r);
     }
 
     void onTurnTimeout()
@@ -75,7 +85,7 @@ public partial class main : Control
         {
             var originalRule = originalSimulation.Rule;
             Console.WriteLine($"diff before analyze: {originalRule.AverageDifference(recreatedSimulation.Rule)}");
-            var predicted = Analyzer.Analyze(gridStates.ToArray());
+            var predicted = Analyzer.SingleRule(gridStates.ToArray(), 2);
             recreatedSimulation.Rule = predicted;
             Console.WriteLine($"diff after analyze: {recreatedSimulation.Rule.AverageDifference(originalRule)}");
             originalSimulation.Randomize();
@@ -110,8 +120,8 @@ public partial class main : Control
         recreatedSimulation.Advance();
 
         var view = originalSimulation.GetCurrentStateView();
-        originalView.SetState(view);
-        recreatedView.SetState(recreatedSimulation.GetCurrentStateView());
+        originalView.SetState(view, originalSimulation.Rule.StatesCount);
+        recreatedView.SetState(recreatedSimulation.GetCurrentStateView(), originalSimulation.Rule.StatesCount);
         if (gridStates != null) gridStates.Add(view);
     }
 

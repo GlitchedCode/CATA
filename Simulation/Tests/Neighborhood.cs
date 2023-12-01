@@ -4,18 +4,23 @@ using System.Collections.Generic;
 public class NeighborhoodTests
 {
     [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    public void VonNeumannBoolConfigurations(uint radius)
+    [InlineData(1, 2)]
+    [InlineData(1, 3)]
+    [InlineData(1, 4)]
+    [InlineData(1, 5)]
+    [InlineData(1, 6)]
+    [InlineData(1, 7)]
+    [InlineData(1, 8)]
+    public void VonNeumannConfigurations(uint radius, int stateCount)
     {
         var neighborhood = new VonNeumann(radius);
         List<ConfigurationKey> configs = new();
 
-        foreach (var k in neighborhood.EnumerateConfigurations(2))
+        foreach (var k in neighborhood.EnumerateConfigurations(stateCount))
             configs.Add(k);
 
-        Assert.Equal(configs.Count, Math.Pow(2, (int)neighborhood.Count()));
+        Console.WriteLine($"{radius} {stateCount}");
+        Assert.Equal(configs.Count, Math.Pow(stateCount, (int)neighborhood.Count()));
 
         while(configs.Count > 0)
         {

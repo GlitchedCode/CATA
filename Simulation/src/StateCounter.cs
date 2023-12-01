@@ -8,6 +8,11 @@ public class StateCounter
     uint[] counters;
     Random rng = new();
 
+    public uint this[int i]
+    {
+        get => counters[i];
+    }
+
     public StateCounter(int statesCount, Random rng = null)
     {
         counters = new uint[statesCount];

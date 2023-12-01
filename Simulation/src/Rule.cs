@@ -3,7 +3,7 @@ namespace Simulation;
 using System;
 using System.Collections.Generic;
 
-public class Rule
+public class Rule : ICloneable
 {
     Dictionary<ConfigurationKey, StateCounter> stateTable = new();
     public int DefaultState;
@@ -75,6 +75,20 @@ public class Rule
         return new State(BitsCount, state);
     }
 
+    public static Rule operator +(Rule a, Rule b)
+    {
+        var ret = (Rule)a.Clone();
+
+        foreach (var k in b.stateTable.Keys)
+        {
+            var counter = b.stateTable[k];
+            for (int i = 0; i < ret.StatesCount; i++)
+                ret.Increment(k, i, counter[i]);
+        }
+
+        return ret;
+    }
+
     public double[] Distribution(ConfigurationKey configurationKey)
     {
         if (stateTable.ContainsKey(configurationKey))
@@ -83,7 +97,13 @@ public class Rule
         return new double[] { 1 };
     }
 
-    public double Variance() => 0;
+    public double Variance(ConfigurationKey configurationKey)
+    {
+        if (stateTable.ContainsKey(configurationKey))
+            return stateTable[configurationKey].Variance();
+
+        return 0d;
+    }
 
     public double AverageDifference(Rule other)
     {
@@ -107,6 +127,32 @@ public class Rule
         return ret / count;
     }
 
+    public double AverageVariance()
+    {
+        var ret = 0d;
+        var count = 0d;
+
+        foreach (var key in ConfigurationKeys)
+        {
+            ret += Variance(key);
+            count += 1d;
+        }
+
+        return ret / count;
+    }
+
+    public object Clone()
+    {
+        var ret = new Rule(StatesCount, DefaultState);
+        ret.Neighborhood = Neighborhood;
+        foreach (var k in stateTable.Keys)
+        {
+            var counter = stateTable[k];
+            for (int i = 0; i < StatesCount; i++)
+                ret.Increment(k, i, counter[i]);
+        }
+        return ret;
+    }
 
 }
 

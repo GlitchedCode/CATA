@@ -8,10 +8,12 @@ public partial class SimulationView : Control
     [Export] Color aliveColor = new Color(1, 1, 1);
 
     Grid2DView<State> gridState = null;
+    int stateCount;
 
-    public void SetState(Grid2DView<State> s)
+    public void SetState(Grid2DView<State> s, int stateCount)
     {
         gridState = s;
+        this.stateCount = stateCount;
         QueueRedraw();
     }
 
@@ -30,11 +32,15 @@ public partial class SimulationView : Control
                 {
                     var state = gridState.Get(r, c);
                     var value = state.Value;
-                    if (value != 0)
+                    if (value > 0)
                     {
                         var pos = new Vector2((c) * cellSize.X, (r) * cellSize.Y) + vRect.Position;
                         var rect = new Rect2(pos, cellSize);
-                        DrawRect(rect, aliveColor);
+
+                        var t = (float)value / (float)(stateCount - 1);
+                        var color = deadColor.Lerp(aliveColor, t);
+
+                        DrawRect(rect, color);
                     }
                 }
         }
