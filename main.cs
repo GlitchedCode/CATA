@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Text.Json;
 using System.Collections.Generic;
 using Simulation;
 
@@ -71,6 +72,11 @@ public partial class main : Control
         }
 
         var ruleTimeSeries = Analyzer.TimeSeries(timeSeries.ToArray(), stateCount);
+
+        string fileName = "ruleData.json";
+        string jsonString = JsonSerializer.Serialize(ruleTimeSeries);
+        File.WriteAllText(fileName, jsonString);
+
 
         var ret = ruleTimeSeries[0];
         return ruleTimeSeries.Skip(0).Aggregate(ret,
