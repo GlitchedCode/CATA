@@ -1,8 +1,5 @@
 using Godot;
-using System;
 using System.Text.Json;
-using System.Collections.Generic;
-using Simulation;
 
 public partial class main : Control
 {
@@ -46,7 +43,7 @@ public partial class main : Control
 
     Rule AnalyzeVideo()
     {
-        var stateCount = 4;
+        var stateCount = 2;
         var bitCount = (int)Math.Ceiling(Math.Log2(stateCount));
         var stateWidth = 1d / (double)stateCount;
 
@@ -77,9 +74,28 @@ public partial class main : Control
         string jsonString = JsonSerializer.Serialize(ruleTimeSeries);
         File.WriteAllText(fileName, jsonString);
 
+        // plot della probabilità che lo stato successivo sia 1
+        // per ciascuna configurazione in relazione al tempo
+        var plt = new ScottPlot.Plot();
+
+        var hood = ruleTimeSeries[0].Neighborhood;
+        var xData = Enumerable.Range(0, ruleTimeSeries.Count())
+            .Select(x => (double)x).ToArray();
+
+        foreach (var k in hood.EnumerateConfigurations(stateCount))
+        {
+            var list = new List<double>();
+
+            for(int i = 0; i < ruleTimeSeries.Count(); i++)
+                list.Add(ruleTimeSeries[i].Distribution(k)[stateCount - 1]);
+
+            plt.AddScatterLines(xData, list.ToArray());
+        }
+
+        plt.SaveFig("activation_probability_by_turn.png");
 
         var ret = ruleTimeSeries[0];
-        return ruleTimeSeries.Skip(0).Aggregate(ret,
+        return ruleTimeSeries.Skip(1).Aggregate(ret,
                                                 (x, y) => x + y,
                                                 r => r);
     }

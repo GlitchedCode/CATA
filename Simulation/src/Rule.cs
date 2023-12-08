@@ -97,7 +97,9 @@ namespace Simulation
             if (stateTable.ContainsKey(configurationKey))
                 return stateTable[configurationKey].Distribution();
 
-            return new double[] { 1 };
+            var ret = Enumerable.Repeat(0.0, StatesCount).ToArray();
+            ret[0] = 1;
+            return ret;
         }
 
         public double Variance(ConfigurationKey configurationKey)
