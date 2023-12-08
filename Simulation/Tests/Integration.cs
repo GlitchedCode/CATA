@@ -15,7 +15,7 @@ public class IntegrationTest
         rule.Neighborhood = new VonNeumann(1);
 
         var config = Enumerable.Range(1, 5).Select(_ => new State(1, 0)).ToArray();
-        Assert.Equal((int)rule.Neighborhood.Count(), config.Length);
+        Assert.Equal((int)rule.Neighborhood.Count2D(), config.Length);
 
         var configKey = Neighborhood.Encode(config);
 

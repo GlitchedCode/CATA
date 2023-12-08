@@ -163,14 +163,14 @@ namespace Simulation
 
     public class RandomRule
     {
-        public static Rule Make(Neighborhood neighborhood, int stateCount, Random rng = null)
+        public static Rule Make2D(Neighborhood neighborhood, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
 
             var ret = new Rule(stateCount);
             ret.Neighborhood = neighborhood;
 
-            foreach (var config in neighborhood.EnumerateConfigurations(stateCount))
+            foreach (var config in neighborhood.Enumerate2DConfigurations(stateCount))
             {
                 if (rng.Next(2) == 0)
                     ret.Set(config, rng.Next(stateCount));

@@ -3,14 +3,14 @@ namespace Simulation;
 using System;
 
 
-public class Analyzer
+public class Analyzer2D
 {
-    public static bool Validate(Rule rule, Grid2DView<State>[] dynamics)
+    public static bool Validate(Rule rule, Container.Grid2D<State>.View[] dynamics)
     {
         return false;
     }
 
-    public static Rule SingleRule(Grid2DView<State>[] dynamics, int statesCount)
+    public static Rule SingleRule(Container.Grid2D<State>.View[] dynamics, int statesCount)
     {
         var rows = dynamics[0].Rows;
         var columns = dynamics[0].Columns;
@@ -27,7 +27,7 @@ public class Analyzer
             for (int r = 0; r < rows; ++r)
                 for (int c = 0; c < columns; ++c)
                 {
-                    var configuration = ret.Neighborhood.Get(current, r, c);
+                    var configuration = ret.Neighborhood.Get2D(current, r, c);
                     var configKey = Neighborhood.Encode(configuration);
 
                     var expected = next.Get(r, c);
@@ -38,7 +38,7 @@ public class Analyzer
         return ret;
     }
 
-    public static Rule[] TimeSeries(Grid2DView<State>[] dynamics, int statesCount)
+    public static Rule[] TimeSeries(Container.Grid2D<State>.View[] dynamics, int statesCount)
     {
         var rows = dynamics[0].Rows;
         var columns = dynamics[0].Columns;
@@ -57,7 +57,7 @@ public class Analyzer
             for (int r = 0; r < rows; ++r)
                 for (int c = 0; c < columns; ++c)
                 {
-                    var configuration = rule.Neighborhood.Get(current, r, c);
+                    var configuration = rule.Neighborhood.Get2D(current, r, c);
                     var configKey = Neighborhood.Encode(configuration);
 
                     var expected = next.Get(r, c);

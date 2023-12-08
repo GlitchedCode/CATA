@@ -15,16 +15,19 @@ namespace Simulation
             this.Radius = radius;
         }
 
-        public override uint Count()
+        public override uint Count2D()
         {
             uint ret = 1 + (Radius * 4);
             for (uint i = 1; i < Radius; i++) ret += i * 4;
             return ret;
         }
 
-        public override State[] Get(Grid2DView<State> gridState, int row, int column)
+        public override uint Count1D()
+            => (Radius * 2) + 1;
+
+        public override State[] Get2D(Container.Grid2D<State>.View gridState, int row, int column)
         {
-            var count = Count();
+            var count = Count2D();
             State[] configuration = new State[count];
 
             configuration[0] = gridState.Get(row, column);
@@ -52,17 +55,36 @@ namespace Simulation
             return configuration;
         }
 
+        public override State[] Get1D(Container.Array<State>.View state, int index)
+        {
+            var count = Count1D();
+            State[] configuration = new State[count];
+
+            configuration[0] = state.Get(index);
+            var idx = 1;
+
+            for (int i = 1; i <= Radius; i++)
+            {
+                configuration[idx] = state.Get(index - i);
+                idx++;
+                configuration[idx] = state.Get(index + i);
+                idx++;
+            }
+
+            return configuration;
+        }
+
         public State[] Convert(State[] input, State defaultValue)
         {
-            var count = Count();
-            var ret = Enumerable.Range(1, (int)Count()).Select(_ => (State)defaultValue.Clone()).ToArray();
+            var count = Count2D();
+            var ret = Enumerable.Range(1, (int)Count2D()).Select(_ => (State)defaultValue.Clone()).ToArray();
             Array.Copy(input, 0, ret, 0, input.Length);
             return ret;
         }
 
         public override ConfigurationKey ConvertKey(ConfigurationKey input, State defaultValue)
         {
-            var config = Enumerable.Range(1, (int)Count()).Select(_ => (State)defaultValue.Clone()).ToArray();
+            var config = Enumerable.Range(1, (int)Count2D()).Select(_ => (State)defaultValue.Clone()).ToArray();
             var ret = Encode(config);
 
             Array.Copy(input.Bytes, 0, ret.Bytes, 0, Math.Min(input.Bytes.Length, ret.Bytes.Length));

@@ -16,11 +16,11 @@ public class NeighborhoodTests
         var neighborhood = new VonNeumann(radius);
         List<ConfigurationKey> configs = new();
 
-        foreach (var k in neighborhood.EnumerateConfigurations(stateCount))
+        foreach (var k in neighborhood.Enumerate2DConfigurations(stateCount))
             configs.Add(k);
 
         Console.WriteLine($"{radius} {stateCount}");
-        Assert.Equal(configs.Count, Math.Pow(stateCount, (int)neighborhood.Count()));
+        Assert.Equal(configs.Count, Math.Pow(stateCount, (int)neighborhood.Count2D()));
 
         while(configs.Count > 0)
         {

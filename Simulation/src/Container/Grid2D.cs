@@ -1,13 +1,12 @@
-namespace Simulation;
+namespace Simulation.Container;
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 
-public class Grid2DContainer<T>
+public class Grid2D<T>
 {
-
     private readonly ConcurrentDictionary<int, T> map;
     public int Rows { get; private set; }
     public int Columns { get; private set; }
@@ -15,10 +14,10 @@ public class Grid2DContainer<T>
     public readonly T DefaultValue;
 
     // Initializes the ArrayList objects
-    public Grid2DContainer(int rows, int cols, T sparseDefault)
+    public Grid2D(int rows, int cols, T sparseDefault)
     {
         if (rows < 0 | cols < 0) // sanity check
-            throw new Exception("Invalid size values for TwoDimensionalArrayList");
+            throw new Exception("Invalid size values");
 
         this.Rows = rows;
         this.Columns = cols;
@@ -35,16 +34,16 @@ public class Grid2DContainer<T>
         if (rows < 0 | cols < 0) // sanity check
             throw new Exception("Invalid size values for TwoDimensionalArrayList");
 
-        List<long> keys = new();
+        List<int> removed = new();
         foreach (var key in map.Keys)
         {
             int row = GetRowFromKey(key);
             int col = GetColumnFromKey(key);
             if (row >= rows | col >= cols)
-                keys.Add(key);
+                removed.Add(key);
         }
 
-        foreach (var key in map.Keys)
+        foreach (var key in removed)
             map.Remove(key, out var _);
 
         this.Rows = rows;
@@ -77,44 +76,40 @@ public class Grid2DContainer<T>
     public void Remove(int row, int col) =>
         map.Remove(row << 16 | col, out var _);
 
-    public void Clear()
+    public void Clear() => map.Clear();
+
+    public View GetView() => new View(this);
+
+    private static int GetRowFromKey(int key) =>
+        key >> 16;
+
+    private static int GetColumnFromKey(int key) =>
+        key & 0x0000FFFF;
+
+    private static int GetKeyFromCoords(int row, int col) =>
+        row << 16 | col;
+
+
+    public class View
     {
-        map.Clear();
-        Resize(Rows, Columns);
+        Grid2D<T> container;
+
+        public int Rows => container.Rows;
+        public int Columns => container.Columns;
+
+        public View(Grid2D<T> cont) => container = cont;
+
+        public T Get(int row, int col) =>
+            container.Get(row, col);
+
+
+        private static int GetRowFromKey(int key) =>
+            key >> 16;
+
+        private static int GetColumnFromKey(int key) =>
+            key & 0x0000FFFF;
+
+        private static int GetKeyFromCoords(int row, int col) =>
+            row << 16 | col;
     }
-
-    public Grid2DView<T> GetView() => new Grid2DView<T>(this);
-
-    private static int GetRowFromKey(int key) =>
-        key >> 16;
-
-    private static int GetColumnFromKey(int key) =>
-        key & 0x0000FFFF;
-
-    private static int GetKeyFromCoords(int row, int col) =>
-        row << 16 | col;
-
-}
-
-public class Grid2DView<T>
-{
-    Grid2DContainer<T> container;
-
-    public int Rows => container.Rows;
-    public int Columns => container.Columns;
-
-    public Grid2DView(Grid2DContainer<T> cont) => container = cont;
-
-    public T Get(int row, int col) =>
-        container.Get(row, col);
-
-
-    private static int GetRowFromKey(int key) =>
-        key >> 16;
-
-    private static int GetColumnFromKey(int key) =>
-        key & 0x0000FFFF;
-
-    private static int GetKeyFromCoords(int row, int col) =>
-        row << 16 | col;
 }

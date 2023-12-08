@@ -1,16 +1,14 @@
 using Godot;
-using System;
-using Simulation;
 
 public partial class SimulationView : Control
 {
     [Export] Color deadColor = new Color(0, 0, 0);
     [Export] Color aliveColor = new Color(1, 1, 1);
 
-    Grid2DView<State> gridState = null;
+    Simulation.Container.Grid2D<State>.View gridState = null;
     int stateCount;
 
-    public void SetState(Grid2DView<State> s, int stateCount)
+    public void SetState(Simulation.Container.Grid2D<State>.View s, int stateCount)
     {
         gridState = s;
         this.stateCount = stateCount;

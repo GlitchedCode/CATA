@@ -5,8 +5,8 @@ public partial class main : Control
 {
     SimulationView originalView, recreatedView;
 
-    Model originalSimulation, recreatedSimulation;
-    List<Grid2DView<State>> gridStates;
+    Model2D originalSimulation, recreatedSimulation;
+    List<Simulation.Container.Grid2D<State>.View> gridStates;
 
     Label diffLabel;
 
@@ -35,7 +35,7 @@ public partial class main : Control
         {
             gridStates = new();
             gridStates.Add(originalSimulation.GetCurrentStateView());
-            originalSimulation.Rule = RandomRule.Make(new VonNeumann(1), 2);
+            originalSimulation.Rule = RandomRule.Make2D(new VonNeumann(1), 2);
         }
 
         Advance();
@@ -50,12 +50,12 @@ public partial class main : Control
         var frames = targetFrames.GetFrameCount("default");
         var size = targetFrames.GetFrameTexture("default", 0).GetImage().GetSize();
 
-        List<Grid2DView<State>> timeSeries = new();
+        List<Simulation.Container.Grid2D<State>.View> timeSeries = new();
 
         for (int frame = 0; frame < frames; frame++)
         {
             var img = targetFrames.GetFrameTexture("default", frame).GetImage();
-            var grid = new Grid2DContainer<State>(size.Y, size.X, new State(1, 0));
+            var grid = new Simulation.Container.Grid2D<State>(size.Y, size.X, new State(1, 0));
 
             for (int x = 0; x < size.X; x++)
                 for (int y = 0; y < size.Y; y++)
@@ -68,7 +68,7 @@ public partial class main : Control
             timeSeries.Add(grid.GetView());
         }
 
-        var ruleTimeSeries = Analyzer.TimeSeries(timeSeries.ToArray(), stateCount);
+        var ruleTimeSeries = Analyzer2D.TimeSeries(timeSeries.ToArray(), stateCount);
 
         string fileName = "ruleData.json";
         string jsonString = JsonSerializer.Serialize(ruleTimeSeries);
@@ -82,7 +82,7 @@ public partial class main : Control
         var xData = Enumerable.Range(0, ruleTimeSeries.Count())
             .Select(x => (double)x).ToArray();
 
-        foreach (var k in hood.EnumerateConfigurations(stateCount))
+        foreach (var k in hood.Enumerate2DConfigurations(stateCount))
         {
             var list = new List<double>();
 
@@ -107,7 +107,7 @@ public partial class main : Control
         {
             var originalRule = originalSimulation.Rule;
             Console.WriteLine($"diff before analyze: {originalRule.AverageDifference(recreatedSimulation.Rule)}");
-            var predicted = Analyzer.SingleRule(gridStates.ToArray(), 2);
+            var predicted = Analyzer2D.SingleRule(gridStates.ToArray(), 2);
             recreatedSimulation.Rule = predicted;
             Console.WriteLine($"diff after analyze: {recreatedSimulation.Rule.AverageDifference(originalRule)}");
             originalSimulation.Randomize();

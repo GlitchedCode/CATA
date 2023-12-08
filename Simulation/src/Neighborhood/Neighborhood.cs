@@ -62,8 +62,11 @@ public class ConfigurationKey
 
 public abstract class Neighborhood
 {
-    public abstract uint Count();
-    public abstract State[] Get(Grid2DView<State> state, int row, int column);
+    public abstract uint Count2D();
+    public abstract uint Count1D();
+
+    public abstract State[] Get2D(Container.Grid2D<State>.View state, int row, int column);
+    public abstract State[] Get1D(Container.Array<State>.View state, int index);
 
     public abstract ConfigurationKey ConvertKey(ConfigurationKey input, State defaultState);
 
@@ -88,11 +91,11 @@ public abstract class Neighborhood
         return new ConfigurationKey(buf);
     }
 
-    public IEnumerable<ConfigurationKey> EnumerateConfigurations(int stateCount)
+    public IEnumerable<ConfigurationKey> Enumerate2DConfigurations(int stateCount)
     {
 
         var bitCount = (int)Math.Ceiling(Math.Log2(stateCount));
-        var config = Enumerable.Range(1, (int)Count()).Select(_ => new State(bitCount)).ToArray();
+        var config = Enumerable.Range(1, (int)Count2D()).Select(_ => new State(bitCount)).ToArray();
 
         IEnumerable<ConfigurationKey> enumerate(int idx)
         {
