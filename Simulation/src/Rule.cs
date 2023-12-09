@@ -163,14 +163,13 @@ namespace Simulation
 
     public class RandomRule
     {
-        public static Rule Make2D(Neighborhood neighborhood, int stateCount, Random rng = null)
+        public static Rule Make(IEnumerable<ConfigurationKey> configurations, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
 
             var ret = new Rule(stateCount);
-            ret.Neighborhood = neighborhood;
 
-            foreach (var config in neighborhood.Enumerate2DConfigurations(stateCount))
+            foreach (var config in configurations)
             {
                 if (rng.Next(2) == 0)
                     ret.Set(config, rng.Next(stateCount));
@@ -179,7 +178,22 @@ namespace Simulation
                         ret.Increment(config, i, (uint)rng.Next() % 5000);
             }
 
+            return ret;
+        }
 
+        public static Rule Make1D(Neighborhood neighborhood, int stateCount, Random rng = null)
+        {
+            if (rng == null) rng = new Random();
+            var ret = Make(neighborhood.Enumerate2DConfigurations(stateCount), stateCount, rng);
+            ret.Neighborhood = neighborhood;
+            return ret;
+        }
+
+        public static Rule Make2D(Neighborhood neighborhood, int stateCount, Random rng = null)
+        {
+            if (rng == null) rng = new Random();
+            var ret = Make(neighborhood.Enumerate2DConfigurations(stateCount), stateCount, rng);
+            ret.Neighborhood = neighborhood;
             return ret;
         }
     }

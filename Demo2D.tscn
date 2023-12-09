@@ -1,0 +1,96 @@
+[gd_scene load_steps=4 format=3 uid="uid://jhdn00vqr61s"]
+
+[ext_resource type="Script" path="res://Demo2D.cs" id="1_daa7f"]
+[ext_resource type="SpriteFrames" uid="uid://25qlnkfxlpk1" path="res://Source Videos/result_reg.tres" id="2_8r5ep"]
+[ext_resource type="Script" path="res://UI/Simulation2DView.cs" id="3_psrun"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_daa7f")
+targetFrames = ExtResource("2_8r5ep")
+
+[node name="Original" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 313.0
+offset_top = 45.0
+offset_right = -388.0
+offset_bottom = -142.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_psrun")
+deadColor = Color(0.141176, 0.0784314, 0.25098, 1)
+aliveColor = Color(0.772549, 0.72549, 0.278431, 1)
+
+[node name="Recreated" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 52.0
+offset_top = 46.0
+offset_right = -649.0
+offset_bottom = -141.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_psrun")
+deadColor = Color(0.141176, 0.0784314, 0.25098, 1)
+aliveColor = Color(0.772549, 0.72549, 0.278431, 1)
+
+[node name="TurnTimer" type="Timer" parent="."]
+wait_time = 0.2
+autostart = true
+
+[node name="labels" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="static" type="Control" parent="labels"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="Label" type="Label" parent="labels/static"]
+layout_mode = 0
+offset_left = 731.0
+offset_top = 563.0
+offset_right = 798.0
+offset_bottom = 589.0
+text = "original"
+
+[node name="Label2" type="Label" parent="labels/static"]
+layout_mode = 0
+offset_left = 153.0
+offset_top = 564.0
+offset_right = 228.0
+offset_bottom = 590.0
+text = "recreated"
+
+[node name="rules" type="Control" parent="labels"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="difference" type="Label" parent="labels/rules"]
+layout_mode = 0
+offset_left = 398.0
+offset_top = 20.0
+offset_right = 609.0
+offset_bottom = 46.0
+text = "difference: wait a sec"

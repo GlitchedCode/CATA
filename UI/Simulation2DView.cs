@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class SimulationView : Control
+public partial class Simulation2DView : Control
 {
     [Export] Color deadColor = new Color(0, 0, 0);
     [Export] Color aliveColor = new Color(1, 1, 1);

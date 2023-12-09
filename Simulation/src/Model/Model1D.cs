@@ -15,7 +15,7 @@ public class Model1D
         Rule = new(2);
         currentState = new(cellCount, DefaultState);
         previousGridState = new(cellCount, DefaultState);
-        ResetState();
+        ResetState(currentState.GetView());
     }
 
     public void Advance()
@@ -55,7 +55,7 @@ public class Model1D
     public void Resize(int cellCount)
     {
         currentState.Resize(cellCount);
-        ResetState();
+        ResetState(currentState.GetView());
     }
 
     public Container.Array<State>.View GetCurrentStateView() => currentState.GetView();

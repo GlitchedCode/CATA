@@ -1,9 +1,9 @@
 using Godot;
 using System.Text.Json;
 
-public partial class main : Control
+public partial class Demo2D : Control
 {
-    SimulationView originalView, recreatedView;
+    Simulation2DView originalView, recreatedView;
 
     Model2D originalSimulation, recreatedSimulation;
     List<Simulation.Container.Grid2D<State>.View> gridStates;
@@ -15,8 +15,8 @@ public partial class main : Control
     public override void _Ready()
     {
         GetNode<Godot.Timer>("TurnTimer").Timeout += onTurnTimeout;
-        originalView = GetNode<SimulationView>("Original");
-        recreatedView = GetNode<SimulationView>("Recreated");
+        originalView = GetNode<Simulation2DView>("Original");
+        recreatedView = GetNode<Simulation2DView>("Recreated");
 
         diffLabel = GetNode<Label>("labels/rules/difference");
 
