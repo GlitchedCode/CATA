@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-public class Array<T>
+public class Array<T> : ICloneable
 {
     private readonly ConcurrentDictionary<int, T> map;
     public int CellCount { get; private set; }
@@ -67,6 +67,17 @@ public class Array<T>
     public View GetView() => new View(this);
 
 
+    public object Clone()
+    {
+        var ret = new Array<T>(CellCount, DefaultValue);
+
+        foreach (var k in map.Keys)
+            ret.Set(k, Get(k));
+
+        return ret;
+    }
+
+
     public class View
     {
         Array<T> container;
@@ -76,5 +87,26 @@ public class Array<T>
         public View(Array<T> cont) => container = cont;
 
         public T Get(int index) => container.Get(index);
+    }
+
+
+    public static void PrintMany(IEnumerable<Array<T>> states)
+    {
+        foreach (var state in states)
+        {
+            for (int i = 0; i < state.CellCount; i++)
+                Console.Write(state.Get(i).ToString());
+            Console.WriteLine();
+        }
+    }
+
+    public static void PrintMany(IEnumerable<Array<State>> states, string charmap)
+    {
+        foreach (var state in states)
+        {
+            for (int i = 0; i < state.CellCount; i++)
+                Console.Write(charmap[state.Get(i).Value]);
+            Console.WriteLine();
+        }
     }
 }

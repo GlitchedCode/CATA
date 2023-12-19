@@ -28,7 +28,7 @@ public partial class Demo1D : Control
 
         if (targetFrames != null)
         {
-            originalSimulation.Rule = AnalyzeVideo();
+            originalSimulation.Rule = AnalyzeImage();
         }
         else
         {
@@ -40,7 +40,7 @@ public partial class Demo1D : Control
         Advance();
     }
 
-    Rule AnalyzeVideo()
+    Rule AnalyzeImage()
     {
         /*
         var stateCount = 2;
@@ -50,25 +50,28 @@ public partial class Demo1D : Control
         var frames = targetFrames.GetFrameCount("default");
         var size = targetFrames.GetFrameTexture("default", 0).GetImage().GetSize();
 
-        List<Simulation.Container.Grid2D<State>.View> timeSeries = new();
+        List<Simulation.Container.Array<State>.View> timeSeries = new();
 
         for (int frame = 0; frame < frames; frame++)
         {
             var img = targetFrames.GetFrameTexture("default", frame).GetImage();
             var grid = new Simulation.Container.Grid2D<State>(size.Y, size.X, new State(1, 0));
 
-            for (int x = 0; x < size.X; x++)
+            for (int r = 0; r < size.X; r++)
+            {
+
                 for (int y = 0; y < size.Y; y++)
                 {
-                    var value = img.GetPixel(x, y).R;
+                    var value = img.GetPixel(r, y).R;
                     var state = Math.Clamp((int)Math.Floor(value / stateWidth), 0, stateCount - 1);
-                    grid.Set(y, x, new State(bitCount, state));
+                    grid.Set(y, r, new State(bitCount, state));
                 }
+            }
 
             timeSeries.Add(grid.GetView());
         }
 
-        var ruleTimeSeries = Analyzer2D.TimeSeries(timeSeries.ToArray(), stateCount);
+        var ruleTimeSeries = Analyzer1D.TimeSeries(timeSeries.ToArray(), stateCount);
 
         string fileName = "ruleData.json";
         string jsonString = JsonSerializer.Serialize(ruleTimeSeries);
@@ -86,7 +89,7 @@ public partial class Demo1D : Control
         {
             var list = new List<double>();
 
-            for(int i = 0; i < ruleTimeSeries.Count(); i++)
+            for (int i = 0; i < ruleTimeSeries.Count(); i++)
                 list.Add(ruleTimeSeries[i].Distribution(k)[stateCount - 1]);
 
             plt.AddScatterLines(xData, list.ToArray());
@@ -98,7 +101,7 @@ public partial class Demo1D : Control
         return ruleTimeSeries.Skip(1).Aggregate(ret,
                                                 (x, y) => x + y,
                                                 r => r);
-        */
+                                                */
         return new Rule(2, 0);
     }
 

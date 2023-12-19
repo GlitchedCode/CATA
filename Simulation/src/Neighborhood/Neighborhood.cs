@@ -33,8 +33,8 @@ public class ConfigurationKey
 
     public ConfigurationKey(string keyString)
     {
-        if(keyString == null) keyString = "";
-        String = keyString;
+        if (keyString == null) keyString = "";
+        this.String = keyString;
     }
 
     public ConfigurationKey(byte[] bytes = null)
@@ -90,6 +90,32 @@ public abstract class Neighborhood
 
         return new ConfigurationKey(buf);
     }
+
+    public static State[] Decode(ConfigurationKey config, int bitCount)
+    {
+        var buf = config.Bytes;
+        var statesPerByte = 8 / bitCount;
+
+        var ret = new State[buf.Length * statesPerByte];
+        var stateIdx = 0;
+
+        for (int i = 0; i < buf.Length; i++)
+        {
+            var bitIdx = 0;
+            var leftShift = 0;
+            while ((leftShift = 8 - bitIdx - bitCount) >= 0)
+            {
+                var val = (buf[i] << leftShift);
+                val = val >> (8 - bitCount);
+                ret[stateIdx] = new State(bitCount, val);
+                stateIdx++;
+                bitIdx += bitCount;
+            }
+        }
+
+        return ret;
+    }
+
 
     public IEnumerable<ConfigurationKey> Enumerate2DConfigurations(int stateCount)
     {

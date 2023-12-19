@@ -1,5 +1,6 @@
 using Godot;
 using System.Text.Json;
+using System.IO;
 
 public partial class Demo2D : Control
 {
@@ -43,7 +44,7 @@ public partial class Demo2D : Control
 
     Rule AnalyzeVideo()
     {
-        var stateCount = 2;
+        var stateCount = 4;
         var bitCount = (int)Math.Ceiling(Math.Log2(stateCount));
         var stateWidth = 1d / (double)stateCount;
 
@@ -76,23 +77,43 @@ public partial class Demo2D : Control
 
         // plot della probabilità che lo stato successivo sia 1
         // per ciascuna configurazione in relazione al tempo
-        var plt = new ScottPlot.Plot();
+        var graphDir = "graphs";
+        var di = Directory.CreateDirectory(graphDir);
+        foreach (FileInfo file in di.GetFiles())
+            file.Delete();
+        foreach (DirectoryInfo dir in di.GetDirectories())
+            dir.Delete(true);
 
         var hood = ruleTimeSeries[0].Neighborhood;
         var xData = Enumerable.Range(0, ruleTimeSeries.Count())
             .Select(x => (double)x).ToArray();
 
-        foreach (var k in hood.Enumerate2DConfigurations(stateCount))
+        var cfgIdx = 0;
+        foreach (var k in ruleTimeSeries[0].ConfigurationKeys)
         {
             var list = new List<double>();
 
-            for(int i = 0; i < ruleTimeSeries.Count(); i++)
-                list.Add(ruleTimeSeries[i].Distribution(k)[stateCount - 1]);
+            var min = 1d;
+            var max = 0d;
 
-            plt.AddScatterLines(xData, list.ToArray());
+            for (int i = 0; i < ruleTimeSeries.Count(); i++)
+            {
+                var p = ruleTimeSeries[i].Distribution(k)[stateCount - 1];
+                if (p < min) min = p;
+                if (p > max) max = p;
+                list.Add(p);
+            }
+
+            if (min > 0.05 ^ max < 0.95)
+            {
+                var plt = new ScottPlot.Plot();
+                var states = Simulation.Neighborhood.Decode(k, ruleTimeSeries[0].BitsCount);
+                plt.Title(String.Join(", ", states));
+                plt.AddScatterLines(xData, list.ToArray());
+                plt.SaveFig($"{graphDir}/{cfgIdx}.png");
+                cfgIdx++;
+            }
         }
-
-        plt.SaveFig("activation_probability_by_turn.png");
 
         var ret = ruleTimeSeries[0];
         return ruleTimeSeries.Skip(1).Aggregate(ret,
