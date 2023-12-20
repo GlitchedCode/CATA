@@ -1,31 +1,42 @@
 namespace Simulation;
 
 using System;
+using System.Collections.Generic;
 
 public class Model1D
 {
-    public Rule Rule;
+    public PastStateRule Rule;
+
+    int maxStateHistory;
+    List<Container.Array<State>.View> stateHistory = new();
     Container.Array<State> currentState;
-    Container.Array<State> previousGridState;
 
     public State DefaultState = new State(1, 0);
 
-    public Model1D(int cellCount)
+    public Model1D(int cellCount, int maxStateHistory = 1)
     {
+        if (maxStateHistory < 1)
+            this.maxStateHistory = 1;
+        else
+            this.maxStateHistory = maxStateHistory;
+
         Rule = new(2);
         currentState = new(cellCount, DefaultState);
-        previousGridState = new(cellCount, DefaultState);
         ResetState(currentState.GetView());
     }
 
     public void Advance()
     {
-        previousGridState = currentState;
-        currentState = new(previousGridState.CellCount, DefaultState);
+        stateHistory.Insert(0, currentState.GetView());
+        var diff = stateHistory.Count - maxStateHistory;
+        if (diff > 0)
+            stateHistory.RemoveRange(maxStateHistory, diff);
+
+        currentState = new(stateHistory[0].CellCount, DefaultState);
         for (int i = 0; i < currentState.CellCount; ++i)
         {
             // von neumann
-            var configuration = Rule.Neighborhood.Get1D(previousGridState.GetView(), i);
+            var configuration = Rule.Neighborhood.Get1D(stateHistory.ToArray(), i);
             var configKey = Neighborhood.Encode(configuration);
             currentState.Set(i, Rule.Get(configKey));
         }
@@ -59,5 +70,4 @@ public class Model1D
     }
 
     public Container.Array<State>.View GetCurrentStateView() => currentState.GetView();
-    public Container.Array<State>.View GetPreviousStateView() => previousGridState.GetView();
 }

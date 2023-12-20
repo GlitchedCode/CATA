@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 
 using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Interaction;
 
 using Simulation;
 
@@ -23,7 +22,7 @@ class Program
         List<SimState> sequence = new();
         var state = new SimState(128, offState);
 
-        foreach (var trackChunk in file.Chunks.OfType<TrackChunk>())
+        foreach (var trackChunk in file.Chunks.OfType<TrackChunk>().Skip(track))
         {
             foreach (var ev in trackChunk.Events.OfType<NoteEvent>().Where((e) => e.Channel == channel))
             {
@@ -52,7 +51,7 @@ class Program
                 state.Set(note, cellState);
             }
             sequence.Add(state);
-
+            break;
         }
 
         return sequence;
@@ -62,7 +61,7 @@ class Program
     {
         var midiFile = MidiFile.Read("test.mid");
 
-        SimState.PrintMany(MidiFileToSimStates(midiFile, 0, 4, 2), ".O");
+        SimState.PrintMany(MidiFileToSimStates(midiFile, 3, 4, 2), ".O");
 
         midiFile.Write("out.mid", overwriteFile: true);
     }

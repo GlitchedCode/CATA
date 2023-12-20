@@ -83,6 +83,7 @@ public class Array<T> : ICloneable
         Array<T> container;
 
         public int CellCount => container.CellCount;
+        public T DefaultValue => container.DefaultValue;
 
         public View(Array<T> cont) => container = cont;
 

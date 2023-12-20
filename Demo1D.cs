@@ -34,13 +34,13 @@ public partial class Demo1D : Control
         {
             states = new();
             states.Add(originalSimulation.GetCurrentStateView());
-            originalSimulation.Rule = RandomRule.Make1D(new VonNeumann(1), 2);
+            originalSimulation.Rule = PastStateRule.Random1D(new Radius1D(2, 2), 4);
         }
 
         Advance();
     }
 
-    Rule AnalyzeImage()
+    PastStateRule AnalyzeImage()
     {
         /*
         var stateCount = 2;
@@ -102,7 +102,7 @@ public partial class Demo1D : Control
                                                 (x, y) => x + y,
                                                 r => r);
                                                 */
-        return new Rule(2, 0);
+        return new PastStateRule(2, 0);
     }
 
     void onTurnTimeout()

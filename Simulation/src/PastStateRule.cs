@@ -4,16 +4,16 @@ using System.Text.Json;
 
 namespace Simulation
 {
-    [JsonConverter(typeof(Json.RuleConverter))]
-    public class Rule : ICloneable
+    [JsonConverter(typeof(Json.PastStateRuleConverter))]
+    public class PastStateRule : ICloneable
     {
         Dictionary<ConfigurationKey, StateCounter> stateTable = new();
         public int DefaultState;
         public int StatesCount { get; protected set; }
         public int BitsCount { get; protected set; }
 
-        private Neighborhood __neighborhood;
-        public Neighborhood Neighborhood
+        private PastStateNeighborhood __neighborhood;
+        public PastStateNeighborhood Neighborhood
         {
             get => __neighborhood;
             set
@@ -30,12 +30,12 @@ namespace Simulation
 
         Random rng = new();
 
-        public Rule(int statesCount, int defaultState = 0)
+        public PastStateRule(int statesCount, int defaultState = 0)
         {
             DefaultState = defaultState;
             StatesCount = statesCount;
             BitsCount = (int)Math.Ceiling(Math.Log2(StatesCount));
-            __neighborhood = new VonNeumann();
+            __neighborhood = new Radius1D();
         }
 
         void EnsureKey(ConfigurationKey key)
@@ -77,9 +77,9 @@ namespace Simulation
             return new State(BitsCount, state);
         }
 
-        public static Rule operator +(Rule a, Rule b)
+        public static PastStateRule operator +(PastStateRule a, PastStateRule b)
         {
-            var ret = (Rule)a.Clone();
+            var ret = (PastStateRule)a.Clone();
 
             foreach (var k in b.stateTable.Keys)
             {
@@ -147,7 +147,7 @@ namespace Simulation
 
         public object Clone()
         {
-            var ret = new Rule(StatesCount, DefaultState);
+            var ret = new PastStateRule(StatesCount, DefaultState);
             ret.Neighborhood = Neighborhood;
             foreach (var k in stateTable.Keys)
             {
@@ -157,16 +157,16 @@ namespace Simulation
             }
             return ret;
         }
-    }
 
 
-    public class RandomRule
-    {
-        public static Rule Make(IEnumerable<ConfigurationKey> configurations, int stateCount, Random rng = null)
+
+        /* RANDOM GENERATION */
+
+        public static PastStateRule Random(IEnumerable<ConfigurationKey> configurations, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
 
-            var ret = new Rule(stateCount);
+            var ret = new PastStateRule(stateCount);
 
             foreach (var config in configurations)
             {
@@ -180,14 +180,16 @@ namespace Simulation
             return ret;
         }
 
-        public static Rule Make1D(Neighborhood neighborhood, int stateCount, Random rng = null)
+        public static PastStateRule Random1D(PastStateNeighborhood neighborhood, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
-            var ret = Make(neighborhood.Enumerate2DConfigurations(stateCount), stateCount, rng);
+            var ret = Random(neighborhood.EnumerateConfigurations(stateCount), stateCount, rng);
             ret.Neighborhood = neighborhood;
             return ret;
         }
 
+        /*
+         *
         public static Rule Make2D(Neighborhood neighborhood, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
@@ -195,11 +197,13 @@ namespace Simulation
             ret.Neighborhood = neighborhood;
             return ret;
         }
+         */
     }
+
 
     namespace Json
     {
-        public class RuleConverter : JsonConverter<Rule>
+        public class PastStateRuleConverter : JsonConverter<Rule>
         {
             static Neighborhood NeighborhoodDeserialize(
                 ref Utf8JsonReader reader,
@@ -344,5 +348,4 @@ namespace Simulation
 
         }
     }
-
 }

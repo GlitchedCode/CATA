@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CATA", "CATA.csproj", "{5AA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulation", "Simulation\Simulation.csproj", "{6812D544-459E-4B03-A345-57A9FB9F1C4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiAnalyzer", "MidiAnalyzer\MidiAnalyzer.csproj", "{22EF1EE6-ACE8-4051-B9FB-2DA5DD837D50}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,11 +35,5 @@ Global
 		{EDBA4E1F-41AC-46C4-80C8-3321E3CFD4B1}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{EDBA4E1F-41AC-46C4-80C8-3321E3CFD4B1}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{EDBA4E1F-41AC-46C4-80C8-3321E3CFD4B1}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
-		{22EF1EE6-ACE8-4051-B9FB-2DA5DD837D50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{22EF1EE6-ACE8-4051-B9FB-2DA5DD837D50}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{22EF1EE6-ACE8-4051-B9FB-2DA5DD837D50}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
-		{22EF1EE6-ACE8-4051-B9FB-2DA5DD837D50}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
-		{22EF1EE6-ACE8-4051-B9FB-2DA5DD837D50}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
-		{22EF1EE6-ACE8-4051-B9FB-2DA5DD837D50}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal
