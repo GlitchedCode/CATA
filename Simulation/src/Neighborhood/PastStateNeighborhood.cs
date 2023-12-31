@@ -1,10 +1,10 @@
 namespace Simulation;
 
-public abstract class PastStateNeighborhood
+public abstract class Neighborhood1D
 {
-    public abstract uint Count1D();
+    public abstract uint Count();
 
-    public abstract State[] Get1D(Container.Array<State>.View[] states, int index);
+    public abstract State[] Get(Container.Array<State>.View[] states, int index);
 
     public static ConfigurationKey Encode(State[] configuration)
     {
@@ -16,16 +16,23 @@ public abstract class PastStateNeighborhood
         return Neighborhood.Decode(config, bitCount);
     }
 
-    public IEnumerable<ConfigurationKey> EnumerateConfigurations(int stateCount)
+    public IEnumerable<ConfigurationKey> EnumerateConfigurationKeys(int stateCount)
+    {
+        foreach(var c in EnumerateConfigurations(stateCount))
+            yield return Neighborhood.Encode(c);
+        yield break;
+    }
+
+    public IEnumerable<State[]> EnumerateConfigurations(int stateCount)
     {
         var bitCount = (int)Math.Ceiling(Math.Log2(stateCount));
-        var config = Enumerable.Range(1, (int)Count1D()).Select(_ => new State(bitCount)).ToArray();
+        var config = Enumerable.Range(1, (int)Count()).Select(_ => new State(bitCount)).ToArray();
 
-        IEnumerable<ConfigurationKey> enumerate(int idx)
+        IEnumerable<State[]> enumerate(int idx)
         {
             if (idx < 0)
             {
-                yield return Neighborhood.Encode(config);
+                yield return config;
                 yield break;
             }
 

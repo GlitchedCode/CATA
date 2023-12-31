@@ -4,84 +4,59 @@ using System.Text.Json;
 
 namespace Simulation
 {
-    [JsonConverter(typeof(Json.RuleConverter))]
-    public class Rule : ICloneable
+    [JsonConverter(typeof(Json.PastStateRuleConverter))]
+    public class SingleRule : Rule, ICloneable
     {
-        Dictionary<ConfigurationKey, StateCounter> stateTable = new();
-        public int DefaultState;
-        public int StatesCount { get; protected set; }
-        public int BitsCount { get; protected set; }
-
-        private Neighborhood __neighborhood;
-        public Neighborhood Neighborhood
-        {
-            get => __neighborhood;
-            set
-            {
-                if (value == null) throw new NullReferenceException();
-                __neighborhood = value;
-            }
-        }
-
-        public IEnumerable<ConfigurationKey> ConfigurationKeys
-        {
-            get => stateTable.Keys;
-        }
-
+        StateTable stateTable;
+        int _StatesCount;
         Random rng = new();
 
-        public Rule(int statesCount, int defaultState = 0)
+        private Neighborhood1D __neighborhood;
+
+        public override int GetDefaultState() => stateTable.DefaultState;
+        public override void SetDefaultState(int v) => stateTable.DefaultState = v;
+        public override int GetStatesCount() => _StatesCount;
+        public override void SetStatesCount(int v) { }
+        public override int GetBitsCount() => (int)Math.Ceiling(Math.Log2(StatesCount));
+        public override void SetBitsCount(int v) { }
+        public override Neighborhood1D GetNeighborhood() => __neighborhood;
+        public override void SetNeighborhood(Neighborhood1D v)
         {
-            DefaultState = defaultState;
-            StatesCount = statesCount;
-            BitsCount = (int)Math.Ceiling(Math.Log2(StatesCount));
-            __neighborhood = new VonNeumann();
+            if (v == null) throw new NullReferenceException();
+            __neighborhood = v;
+        }
+        //public override IEnumerable<ConfigurationKey> GetConfigurationKeys() => stateTable.Keys;
+
+
+        public SingleRule(int statesCount, int defaultState = 0)
+        {
+            _StatesCount = statesCount;
+            stateTable = new StateTree(statesCount, rng);
+            __neighborhood = new Radius1D();
         }
 
-        void EnsureKey(ConfigurationKey key)
-        {
-            if (!stateTable.ContainsKey(key))
-                stateTable[key] = new(StatesCount, rng);
-        }
+        public void Increment(State[] config, int stateValue, uint amount = 1)
+            => stateTable.Increment(config, stateValue, amount);
 
-        public void Increment(ConfigurationKey configurationKey, int stateValue, uint amount = 1)
-        {
-            EnsureKey(configurationKey);
-            stateTable[configurationKey].Increment(stateValue, amount);
-        }
+        public void Set(State[] config, int stateValue)
+            => stateTable.Set(config, stateValue);
 
-        public void Set(ConfigurationKey configurationKey, int stateValue)
-        {
-            EnsureKey(configurationKey);
-            stateTable[configurationKey].Set(stateValue);
-        }
-
-        public void Unset(ConfigurationKey configurationKey)
-        {
-            stateTable.Remove(configurationKey);
-        }
+        public void Unset(State[] config)
+            => stateTable.Unset(config);
 
         public void Reset()
         {
             stateTable.Clear();
         }
 
-        public State Get(ConfigurationKey configurationKey)
+        public override State Get(State[] config)
+            => new State(BitsCount, stateTable.Get(config).Get());
+
+        public static SingleRule operator +(SingleRule a, SingleRule b)
         {
-            int state;
-            if (stateTable.ContainsKey(configurationKey))
-                state = stateTable[configurationKey].Get();
-            else
-                state = DefaultState;
+            var ret = (SingleRule)a.Clone();
 
-            return new State(BitsCount, state);
-        }
-
-        public static Rule operator +(Rule a, Rule b)
-        {
-            var ret = (Rule)a.Clone();
-
-            foreach (var k in b.stateTable.Keys)
+            foreach (var k in b.stateTable.EnumerateConfigurations())
             {
                 var counter = b.stateTable[k];
                 for (int i = 0; i < ret.StatesCount; i++)
@@ -91,36 +66,21 @@ namespace Simulation
             return ret;
         }
 
-        public double[] Distribution(ConfigurationKey configurationKey)
-        {
-            if (stateTable.ContainsKey(configurationKey))
-                return stateTable[configurationKey].Distribution();
+        public override double[] Distribution(State[] config)
+            => stateTable[config].Distribution();
 
-            var ret = Enumerable.Repeat(0.0, StatesCount).ToArray();
-            ret[0] = 1;
-            return ret;
-        }
+        public double Variance(State[] config)
+            => stateTable[config].Variance();
 
-        public double Variance(ConfigurationKey configurationKey)
-        {
-            if (stateTable.ContainsKey(configurationKey))
-                return stateTable[configurationKey].Variance();
-
-            return 0d;
-        }
-
-        public double AverageDifference(Rule other)
+        public double AverageDifference(SingleRule other)
         {
             var ret = 0d;
             var count = 0d;
 
-            foreach (var key in ConfigurationKeys)
+            foreach (var config in stateTable.EnumerateConfigurations())
             {
-                var thisDist = Distribution(key);
-
-                var otherKey = other.Neighborhood.ConvertKey(
-                    key, new State(BitsCount, DefaultState));
-                var otherDist = other.Distribution(otherKey);
+                var thisDist = Distribution(config);
+                var otherDist = other.Distribution(config);
 
                 ret += Math.Abs(thisDist[0] - otherDist[0]);
                 ret += Math.Abs(thisDist[1] - otherDist[1]);
@@ -136,9 +96,9 @@ namespace Simulation
             var ret = 0d;
             var count = 0d;
 
-            foreach (var key in ConfigurationKeys)
+            foreach (var config in stateTable.EnumerateConfigurations())
             {
-                ret += Variance(key);
+                ret += Variance(config);
                 count += 1d;
             }
 
@@ -147,26 +107,32 @@ namespace Simulation
 
         public object Clone()
         {
-            var ret = new Rule(StatesCount, DefaultState);
+            var ret = new SingleRule(StatesCount, DefaultState);
             ret.Neighborhood = Neighborhood;
-            foreach (var k in stateTable.Keys)
+            foreach (var config in stateTable.EnumerateConfigurations())
             {
-                var counter = stateTable[k];
+                var counter = stateTable[config];
                 for (int i = 0; i < StatesCount; i++)
-                    ret.Increment(k, i, counter[i]);
+                    ret.Increment(config, i, counter[i]);
             }
             return ret;
         }
-    }
+
+        public IEnumerable<State[]> EnumerateConfigurations()
+        {
+            foreach (var c in stateTable.EnumerateConfigurations()) yield return c;
+            yield break;
+        }
 
 
-    public class RandomRule
-    {
-        public static Rule Make(IEnumerable<ConfigurationKey> configurations, int stateCount, Random rng = null)
+
+        /* RANDOM GENERATION */
+
+        public static SingleRule Random(IEnumerable<State[]> configurations, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
 
-            var ret = new Rule(stateCount);
+            var ret = new SingleRule(stateCount);
 
             foreach (var config in configurations)
             {
@@ -180,14 +146,16 @@ namespace Simulation
             return ret;
         }
 
-        public static Rule Make1D(Neighborhood neighborhood, int stateCount, Random rng = null)
+        public static SingleRule Random1D(Neighborhood1D neighborhood, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
-            var ret = Make(neighborhood.Enumerate2DConfigurations(stateCount), stateCount, rng);
+            var ret = Random(neighborhood.EnumerateConfigurations(stateCount), stateCount, rng);
             ret.Neighborhood = neighborhood;
             return ret;
         }
 
+        /*
+         *
         public static Rule Make2D(Neighborhood neighborhood, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
@@ -195,11 +163,13 @@ namespace Simulation
             ret.Neighborhood = neighborhood;
             return ret;
         }
+         */
     }
+
 
     namespace Json
     {
-        public class RuleConverter : JsonConverter<Rule>
+        public class PastStateRuleConverter : JsonConverter<OldRule>
         {
             static Neighborhood NeighborhoodDeserialize(
                 ref Utf8JsonReader reader,
@@ -224,7 +194,7 @@ namespace Simulation
                 return null;
             }
 
-            public override Rule Read(
+            public override OldRule Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
                 JsonSerializerOptions options
@@ -292,7 +262,7 @@ namespace Simulation
 
                 }
 
-                Rule ret = new Rule(stateCount, defaultState);
+                OldRule ret = new OldRule(stateCount, defaultState);
                 ret.Neighborhood = neighborhood;
 
                 const int samples = 100000;
@@ -308,7 +278,7 @@ namespace Simulation
 
             public override void Write(
                 Utf8JsonWriter writer,
-                Rule ruleValue,
+                OldRule ruleValue,
                 JsonSerializerOptions options
             )
             {
@@ -344,5 +314,4 @@ namespace Simulation
 
         }
     }
-
 }

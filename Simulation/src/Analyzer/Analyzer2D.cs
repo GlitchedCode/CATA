@@ -5,17 +5,17 @@ using System;
 
 public class Analyzer2D
 {
-    public static bool Validate(Rule rule, Container.Grid2D<State>.View[] dynamics)
+    public static bool Validate(OldRule rule, Container.Grid2D<State>.View[] dynamics)
     {
         return false;
     }
 
-    public static Rule SingleRule(Container.Grid2D<State>.View[] dynamics, int statesCount)
+    public static OldRule SingleRule(Container.Grid2D<State>.View[] dynamics, int statesCount)
     {
         var rows = dynamics[0].Rows;
         var columns = dynamics[0].Columns;
 
-        Rule ret = new(statesCount);
+        OldRule ret = new(statesCount);
         var neighborhood = new VonNeumann(2);
         ret.Neighborhood = neighborhood;
 
@@ -38,9 +38,9 @@ public class Analyzer2D
         return ret;
     }
 
-    public static Rule[] TimeSeries(Container.Grid2D<State>.View[] dynamics, int statesCount)
+    public static OldRule[] TimeSeries(Container.Grid2D<State>.View[] dynamics, int statesCount)
     {
-        var ret = new Rule[dynamics.Length - 1];
+        var ret = new OldRule[dynamics.Length - 1];
 
         for (int i = 0; i < dynamics.Length - 1; ++i)
         {

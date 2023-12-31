@@ -4,7 +4,7 @@ using System;
 
 public class Model2D
 {
-    public Rule Rule;
+    public OldRule Rule;
     Container.Grid2D<State> gridState;
     Container.Grid2D<State> previousGridState;
 

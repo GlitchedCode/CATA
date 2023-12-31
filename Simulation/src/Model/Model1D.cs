@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class Model1D
 {
-    public PastStateRule Rule;
+    public Rule Rule;
 
     int maxStateHistory;
     List<Container.Array<State>.View> stateHistory = new();
@@ -20,25 +20,23 @@ public class Model1D
         else
             this.maxStateHistory = maxStateHistory;
 
-        Rule = new(2);
+        Rule = new SingleRule(2);
         currentState = new(cellCount, DefaultState);
         ResetState(currentState.GetView());
     }
 
     public void Advance()
     {
-        stateHistory.Insert(0, currentState.GetView());
+        stateHistory.Add(currentState.GetView());
         var diff = stateHistory.Count - maxStateHistory;
         if (diff > 0)
-            stateHistory.RemoveRange(maxStateHistory, diff);
+            stateHistory.RemoveRange(0, diff);
 
         currentState = new(stateHistory[0].CellCount, DefaultState);
         for (int i = 0; i < currentState.CellCount; ++i)
         {
-            // von neumann
-            var configuration = Rule.Neighborhood.Get1D(stateHistory.ToArray(), i);
-            var configKey = Neighborhood.Encode(configuration);
-            currentState.Set(i, Rule.Get(configKey));
+            var configuration = Rule.Neighborhood.Get(stateHistory.ToArray(), i);
+            currentState.Set(i, Rule.Get(configuration));
         }
     }
 
@@ -61,6 +59,12 @@ public class Model1D
 
         for (int i = 0; i < state.CellCount; ++i)
             Set(i, getState(i));
+    }
+
+    public void ResetHistory(IEnumerable<Container.Array<State>.View> states)
+    {
+        stateHistory = new(states.Take(states.Count() - 1));
+        ResetState(states.Last());
     }
 
     public void Resize(int cellCount)

@@ -1,6 +1,6 @@
 namespace Simulation;
 
-public class Radius1D : PastStateNeighborhood
+public class Radius1D : Neighborhood1D
 {
     public uint Radius = 1;
     public uint LookBack = 0;
@@ -11,16 +11,19 @@ public class Radius1D : PastStateNeighborhood
         LookBack = lookBack;
     }
 
-    public override uint Count1D()
+    public override uint Count()
         => (1 + (Radius * 2)) * (LookBack + 1);
 
-    public override State[] Get1D(Container.Array<State>.View[] states, int index)
+    public override State[] Get(Container.Array<State>.View[] states, int index)
     {
+        var segment = new ArraySegment<Container.Array<State>.View>
+            (states, 0, Math.Min((int)LookBack + 1, states.Length));
+
         var defaultValue = states[0].DefaultValue;
-        var ret = Enumerable.Range(1, (int)Count1D()).Select(_ => (State)defaultValue.Clone()).ToArray();
+        var ret = Enumerable.Range(1, (int)Count()).Select(_ => (State)defaultValue.Clone()).ToArray();
         var idx = 0;
 
-        foreach (var state in states)
+        foreach (var state in segment)
         {
             ret[idx] = state.Get(index);
             for (int i = 1; i <= Radius; i++)

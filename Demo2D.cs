@@ -42,7 +42,7 @@ public partial class Demo2D : Control
         Advance();
     }
 
-    Rule AnalyzeVideo()
+    OldRule AnalyzeVideo()
     {
         var stateCount = 4;
         var bitCount = (int)Math.Ceiling(Math.Log2(stateCount));
@@ -137,7 +137,7 @@ public partial class Demo2D : Control
             gridStates = null;
 
 
-            void print(Rule r)
+            void print(OldRule r)
             {
                 foreach (var config in r.ConfigurationKeys)
                 {

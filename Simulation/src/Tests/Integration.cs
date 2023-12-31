@@ -11,7 +11,7 @@ public class IntegrationTest
     public void TestBoolDistribution(double trueProbability, uint samples, double eps)
     {
         var rng = new Random();
-        var rule = new Rule(2);
+        var rule = new OldRule(2);
         rule.Neighborhood = new VonNeumann(1);
 
         var config = Enumerable.Range(1, 5).Select(_ => new State(1, 0)).ToArray();

@@ -20,7 +20,7 @@ public partial class Demo1D : Control
 
         diffLabel = GetNode<Label>("labels/rules/difference");
 
-        originalSimulation = new(100);
+        originalSimulation = new(100, 4);
         originalSimulation.Randomize();
 
         recreatedSimulation = new(100);
@@ -34,13 +34,13 @@ public partial class Demo1D : Control
         {
             states = new();
             states.Add(originalSimulation.GetCurrentStateView());
-            originalSimulation.Rule = PastStateRule.Random1D(new Radius1D(2, 2), 4);
+            originalSimulation.Rule = SingleRule.Random1D(new Radius1D(2, 2), 3);
         }
 
         Advance();
     }
 
-    PastStateRule AnalyzeImage()
+    SingleRule AnalyzeImage()
     {
         /*
         var stateCount = 2;
@@ -102,7 +102,7 @@ public partial class Demo1D : Control
                                                 (x, y) => x + y,
                                                 r => r);
                                                 */
-        return new PastStateRule(2, 0);
+        return new SingleRule(2, 0);
     }
 
     void onTurnTimeout()

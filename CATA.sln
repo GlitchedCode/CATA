@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CATA", "CATA.csproj", "{5AA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulation", "Simulation\Simulation.csproj", "{6812D544-459E-4B03-A345-57A9FB9F1C4F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MidiAnalyzer", "MidiAnalyzer", "{AD27B58F-83F5-467B-81C1-CFA8DD1C1025}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiAnalyzer", "MidiAnalyzer\MidiAnalyzer\MidiAnalyzer.csproj", "{77AA558B-9C80-436A-A650-827A60BCC53A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,5 +39,14 @@ Global
 		{EDBA4E1F-41AC-46C4-80C8-3321E3CFD4B1}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{EDBA4E1F-41AC-46C4-80C8-3321E3CFD4B1}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{EDBA4E1F-41AC-46C4-80C8-3321E3CFD4B1}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{77AA558B-9C80-436A-A650-827A60BCC53A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77AA558B-9C80-436A-A650-827A60BCC53A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77AA558B-9C80-436A-A650-827A60BCC53A}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77AA558B-9C80-436A-A650-827A60BCC53A}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{77AA558B-9C80-436A-A650-827A60BCC53A}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{77AA558B-9C80-436A-A650-827A60BCC53A}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{77AA558B-9C80-436A-A650-827A60BCC53A} = {AD27B58F-83F5-467B-81C1-CFA8DD1C1025}
 	EndGlobalSection
 EndGlobal

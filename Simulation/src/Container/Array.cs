@@ -20,6 +20,7 @@ public class Array<T> : ICloneable
         this.DefaultValue = sparseDefault;
 
         map = new(4, cellCount);
+        _view = new View(this);
 
         Resize(cellCount);
     }
@@ -42,14 +43,10 @@ public class Array<T> : ICloneable
 
     public T Get(int index)
     {
-        try
-        {
+        if(map.ContainsKey(index))
             return map[index];
-        }
-        catch
-        {
+        else
             return DefaultValue;
-        }
     }
 
     public void Set(int index, T element)
@@ -64,7 +61,8 @@ public class Array<T> : ICloneable
 
     public void Clear() => map.Clear();
 
-    public View GetView() => new View(this);
+    private View _view;
+    public View GetView() => _view;
 
 
     public object Clone()
@@ -91,23 +89,25 @@ public class Array<T> : ICloneable
     }
 
 
-    public static void PrintMany(IEnumerable<Array<T>> states)
+    public static void PrintMany(IEnumerable<Array<T>.View> states)
     {
         foreach (var state in states)
         {
+            string line = "";
             for (int i = 0; i < state.CellCount; i++)
-                Console.Write(state.Get(i).ToString());
-            Console.WriteLine();
+                line += state.Get(i).ToString();
+            Console.WriteLine(line);
         }
     }
 
-    public static void PrintMany(IEnumerable<Array<State>> states, string charmap)
+    public static void PrintMany(IEnumerable<Array<State>.View> states, string charmap)
     {
         foreach (var state in states)
         {
+            string line = "";
             for (int i = 0; i < state.CellCount; i++)
-                Console.Write(charmap[state.Get(i).Value]);
-            Console.WriteLine();
+                line += charmap[state.Get(i).Value];
+            Console.WriteLine(line);
         }
     }
 }
