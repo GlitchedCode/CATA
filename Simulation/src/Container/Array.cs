@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 
 public class Array<T> : ICloneable
 {
-    private readonly ConcurrentDictionary<int, T> map;
+    protected readonly ConcurrentDictionary<int, T> map;
     public int CellCount { get; private set; }
 
     public readonly T DefaultValue;
@@ -23,6 +23,14 @@ public class Array<T> : ICloneable
         _view = new View(this);
 
         Resize(cellCount);
+    }
+
+    public Array(Array<T> other)
+    {
+        map = other.map;
+        DefaultValue = other.DefaultValue;
+        CellCount = other.CellCount;
+        _view = new View(this);
     }
 
     public void Resize(int cellCount)
@@ -59,7 +67,7 @@ public class Array<T> : ICloneable
 
     public void Remove(int index) => map.Remove(index, out var _);
 
-    public void Clear() => map.Clear();
+    public virtual void Clear() => map.Clear();
 
     private View _view;
     public View GetView() => _view;

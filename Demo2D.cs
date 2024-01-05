@@ -21,28 +21,15 @@ public partial class Demo2D : Control
 
         diffLabel = GetNode<Label>("labels/rules/difference");
 
-        originalSimulation = new(100, 100);
-        //originalSimulation.Randomize();
-
-        recreatedSimulation = new(100, 100);
-
-
-
-        if (targetFrames != null)
-        {
-            originalSimulation.Rule = AnalyzeVideo();
-        }
-        else
-        {
-            gridStates = new();
-            gridStates.Add(originalSimulation.GetCurrentStateView());
-            originalSimulation.Rule = RandomRule.Make2D(new VonNeumann(1), 2);
-        }
+        originalSimulation = new(100, 100, 100);
+        originalSimulation.Randomize();
+        gridStates = new() { originalSimulation.GetCurrentStateView() };
+        originalSimulation.Rule = SingleRule.Random(new VonNeumann(1), 2);
 
         Advance();
     }
 
-    OldRule AnalyzeVideo()
+    Rule AnalyzeVideo()
     {
         var stateCount = 4;
         var bitCount = (int)Math.Ceiling(Math.Log2(stateCount));
@@ -89,7 +76,7 @@ public partial class Demo2D : Control
             .Select(x => (double)x).ToArray();
 
         var cfgIdx = 0;
-        foreach (var k in ruleTimeSeries[0].ConfigurationKeys)
+        foreach (var config in ruleTimeSeries[0].EnumerateConfigurations())
         {
             var list = new List<double>();
 
@@ -98,7 +85,7 @@ public partial class Demo2D : Control
 
             for (int i = 0; i < ruleTimeSeries.Count(); i++)
             {
-                var p = ruleTimeSeries[i].Distribution(k)[stateCount - 1];
+                var p = ruleTimeSeries[i].Distribution(config)[stateCount - 1];
                 if (p < min) min = p;
                 if (p > max) max = p;
                 list.Add(p);
@@ -107,8 +94,7 @@ public partial class Demo2D : Control
             if (min > 0.05 ^ max < 0.95)
             {
                 var plt = new ScottPlot.Plot();
-                var states = Simulation.Neighborhood.Decode(k, ruleTimeSeries[0].BitsCount);
-                plt.Title(String.Join(", ", states));
+                plt.Title(String.Join(", ", config));
                 plt.AddScatterLines(xData, list.ToArray());
                 plt.SaveFig($"{graphDir}/{cfgIdx}.png");
                 cfgIdx++;
@@ -124,22 +110,22 @@ public partial class Demo2D : Control
     void onTurnTimeout()
     {
         Advance();
-        if (gridStates != null && gridStates.Count == 5)
+        if (false && gridStates != null && gridStates.Count == 5)
         {
             var originalRule = originalSimulation.Rule;
-            Console.WriteLine($"diff before analyze: {originalRule.AverageDifference(recreatedSimulation.Rule)}");
+            Console.WriteLine($"diff before analyze: {originalRule.AverageDifference(recreatedSimulation.Rule as SingleRule)}");
             var predicted = Analyzer2D.SingleRule(gridStates.ToArray(), 2);
             recreatedSimulation.Rule = predicted;
-            Console.WriteLine($"diff after analyze: {recreatedSimulation.Rule.AverageDifference(originalRule)}");
+            Console.WriteLine($"diff after analyze: {recreatedSimulation.Rule.AverageDifference(originalRule as SingleRule)}");
             originalSimulation.Randomize();
             recreatedSimulation.ResetState(originalSimulation.GetCurrentStateView());
-            diffLabel.Text = $"difference: {recreatedSimulation.Rule.AverageDifference(originalRule)}";
+            diffLabel.Text = $"difference: {recreatedSimulation.Rule.AverageDifference(originalRule as SingleRule)}";
             gridStates = null;
 
 
-            void print(OldRule r)
+            void print(Rule r)
             {
-                foreach (var config in r.ConfigurationKeys)
+                foreach (var config in r.EnumerateConfigurations())
                 {
                     Console.Write(config.GetHashCode());
                     Console.Write(" ");
@@ -160,11 +146,11 @@ public partial class Demo2D : Control
     public void Advance()
     {
         originalSimulation.Advance();
-        recreatedSimulation.Advance();
+        //recreatedSimulation.Advance();
 
         var view = originalSimulation.GetCurrentStateView();
         originalView.SetState(view, originalSimulation.Rule.StatesCount);
-        recreatedView.SetState(recreatedSimulation.GetCurrentStateView(), originalSimulation.Rule.StatesCount);
+        //recreatedView.SetState(recreatedSimulation.GetCurrentStateView(), originalSimulation.Rule.StatesCount);
         if (gridStates != null) gridStates.Add(view);
     }
 

@@ -18,7 +18,7 @@ public abstract class Rule
         set => SetBitsCount(value);
     }
 
-    public Neighborhood1D Neighborhood
+    public Neighborhood Neighborhood
     {
         get => GetNeighborhood();
         set => SetNeighborhood(value);
@@ -37,12 +37,13 @@ public abstract class Rule
     public abstract void SetStatesCount(int v);
     public abstract int GetBitsCount();
     public abstract void SetBitsCount(int v);
-    public abstract Neighborhood1D GetNeighborhood();
-    public abstract void SetNeighborhood(Neighborhood1D v);
-    //public abstract IEnumerable<ConfigurationKey> GetConfigurationKeys();
+    public abstract Neighborhood GetNeighborhood();
+    public abstract void SetNeighborhood(Neighborhood v);
+    public abstract IEnumerable<State[]> EnumerateConfigurations();
 
 
     public abstract State Get(State[] configuration);
     public abstract double[] Distribution(State[] configuration);
-
+    public abstract double AverageDifference(SingleRule other);
+    public abstract double AverageVariance();
 }

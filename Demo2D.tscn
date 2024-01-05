@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://jhdn00vqr61s"]
+[gd_scene load_steps=3 format=3 uid="uid://jhdn00vqr61s"]
 
 [ext_resource type="Script" path="res://Demo2D.cs" id="1_daa7f"]
-[ext_resource type="SpriteFrames" uid="uid://25qlnkfxlpk1" path="res://Source Videos/result_reg.tres" id="2_8r5ep"]
 [ext_resource type="Script" path="res://UI/Simulation2DView.cs" id="3_psrun"]
 
 [node name="Main" type="Control"]
@@ -12,7 +11,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_daa7f")
-targetFrames = ExtResource("2_8r5ep")
 
 [node name="Original" type="Control" parent="."]
 layout_mode = 1

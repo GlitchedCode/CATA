@@ -3,36 +3,43 @@ namespace Simulation.Container;
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using Xunit.Sdk;
 
-
-public class Grid2D<T>
+public class Grid2D<T> : Array<T>
 {
-    private readonly ConcurrentDictionary<int, T> map;
     public int Rows { get; private set; }
     public int Columns { get; private set; }
 
-    public readonly T DefaultValue;
 
     // Initializes the ArrayList objects
-    public Grid2D(int rows, int cols, T sparseDefault)
+    public Grid2D(int rows, int cols, T sparseDefault) : base(rows * cols, sparseDefault)
     {
-        if (rows < 0 | cols < 0) // sanity check
+        if (rows <= 0 | cols <= 0) // sanity check
             throw new Exception("Invalid size values");
 
         this.Rows = rows;
         this.Columns = cols;
-        this.DefaultValue = sparseDefault;
 
-        map = new(4, rows * cols);
+        Resize(rows, cols);
+    }
 
+    public Grid2D(int rows, int cols, Array<T> array) : base(array)
+    {
+        if (rows <= 0 | cols <= 0) // sanity check
+            throw new Exception("Invalid size values");
+
+        this.Rows = rows;
+        this.Columns = cols;
         Resize(rows, cols);
     }
 
     // Resets the minimum capacity for all the ArrayList objects
     public void Resize(int rows, int cols)
     {
-        if (rows < 0 | cols < 0) // sanity check
-            throw new Exception("Invalid size values for TwoDimensionalArrayList");
+        if (rows <= 0 | cols <= 0) // sanity check
+            throw new Exception("Invalid size values");
+
+        Resize(rows * cols);
 
         List<int> removed = new();
         foreach (var key in map.Keys)
@@ -53,15 +60,10 @@ public class Grid2D<T>
     // Gets element at (row, col) coordinates
     public T Get(int row, int col)
     {
-        int key = row << 16 | col;
-        try
-        {
-            return map[key];
-        }
-        catch
-        {
+        if (row >= Rows | col >= Columns | row < 0 | col < 0)
             return DefaultValue;
-        }
+
+        return base.Get(GetKeyFromCoords(row, col));
     }
 
     // Puts element at (row, col) coordinates
@@ -70,27 +72,25 @@ public class Grid2D<T>
         if (row >= Rows | col >= Columns | row < 0 | col < 0)
             return;
 
-        map[row << 16 | col] = element;
+        base.Set(GetKeyFromCoords(row, col), element);
     }
 
     public void Remove(int row, int col) =>
-        map.Remove(row << 16 | col, out var _);
+        base.Remove(GetKeyFromCoords(row, col));
 
-    public void Clear() => map.Clear();
+    public new View GetView() => new View(this);
 
-    public View GetView() => new View(this);
+    private int GetRowFromKey(int key) =>
+        key / Columns;
 
-    private static int GetRowFromKey(int key) =>
-        key >> 16;
+    private int GetColumnFromKey(int key) =>
+        key % Columns;
 
-    private static int GetColumnFromKey(int key) =>
-        key & 0x0000FFFF;
-
-    private static int GetKeyFromCoords(int row, int col) =>
-        row << 16 | col;
+    private int GetKeyFromCoords(int row, int col) =>
+        (row * Columns) + col;
 
 
-    public class View
+    public new class View
     {
         Grid2D<T> container;
 
@@ -103,13 +103,13 @@ public class Grid2D<T>
             container.Get(row, col);
 
 
-        private static int GetRowFromKey(int key) =>
-            key >> 16;
+        private int GetRowFromKey(int key) =>
+        key / Columns;
 
-        private static int GetColumnFromKey(int key) =>
-            key & 0x0000FFFF;
+        private int GetColumnFromKey(int key) =>
+            key % Columns;
 
-        private static int GetKeyFromCoords(int row, int col) =>
-            row << 16 | col;
+        private int GetKeyFromCoords(int row, int col) =>
+            (row * Columns) + col;
     }
 }

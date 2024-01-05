@@ -11,7 +11,7 @@ namespace Simulation
         int _StatesCount;
         Random rng = new();
 
-        private Neighborhood1D __neighborhood;
+        private Neighborhood __neighborhood;
 
         public override int GetDefaultState() => stateTable.DefaultState;
         public override void SetDefaultState(int v) => stateTable.DefaultState = v;
@@ -19,8 +19,8 @@ namespace Simulation
         public override void SetStatesCount(int v) { }
         public override int GetBitsCount() => (int)Math.Ceiling(Math.Log2(StatesCount));
         public override void SetBitsCount(int v) { }
-        public override Neighborhood1D GetNeighborhood() => __neighborhood;
-        public override void SetNeighborhood(Neighborhood1D v)
+        public override Neighborhood GetNeighborhood() => __neighborhood;
+        public override void SetNeighborhood(Neighborhood v)
         {
             if (v == null) throw new NullReferenceException();
             __neighborhood = v;
@@ -72,7 +72,7 @@ namespace Simulation
         public double Variance(State[] config)
             => stateTable[config].Variance();
 
-        public double AverageDifference(SingleRule other)
+        public override double AverageDifference(SingleRule other)
         {
             var ret = 0d;
             var count = 0d;
@@ -91,7 +91,7 @@ namespace Simulation
             return ret / count;
         }
 
-        public double AverageVariance()
+        public override double AverageVariance()
         {
             var ret = 0d;
             var count = 0d;
@@ -118,12 +118,8 @@ namespace Simulation
             return ret;
         }
 
-        public IEnumerable<State[]> EnumerateConfigurations()
-        {
-            foreach (var c in stateTable.EnumerateConfigurations()) yield return c;
-            yield break;
-        }
-
+        public override IEnumerable<State[]> EnumerateConfigurations()
+            => stateTable.EnumerateConfigurations();
 
 
         /* RANDOM GENERATION */
@@ -146,7 +142,7 @@ namespace Simulation
             return ret;
         }
 
-        public static SingleRule Random1D(Neighborhood1D neighborhood, int stateCount, Random rng = null)
+        public static SingleRule Random(Neighborhood neighborhood, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
             var ret = Random(neighborhood.EnumerateConfigurations(stateCount), stateCount, rng);
@@ -169,7 +165,7 @@ namespace Simulation
 
     namespace Json
     {
-        public class PastStateRuleConverter : JsonConverter<OldRule>
+        public class PastStateRuleConverter : JsonConverter<SingleRule>
         {
             static Neighborhood NeighborhoodDeserialize(
                 ref Utf8JsonReader reader,
@@ -194,7 +190,7 @@ namespace Simulation
                 return null;
             }
 
-            public override OldRule Read(
+            public override SingleRule Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
                 JsonSerializerOptions options
@@ -262,7 +258,7 @@ namespace Simulation
 
                 }
 
-                OldRule ret = new OldRule(stateCount, defaultState);
+                SingleRule ret = new(stateCount, defaultState);
                 ret.Neighborhood = neighborhood;
 
                 const int samples = 100000;
@@ -270,7 +266,8 @@ namespace Simulation
                 {
                     var dist = distributionTable[k];
                     for (int i = 0; i < dist.Length; i++)
-                        ret.Increment(k, i, (uint)(samples * dist[i]));
+                        ret.Increment(OldNeighborhood.Decode(k, (int)Math.Ceiling(Math.Log2(stateCount))), 
+                        i, (uint)(samples * dist[i]));
                 }
 
                 return ret;
@@ -278,7 +275,7 @@ namespace Simulation
 
             public override void Write(
                 Utf8JsonWriter writer,
-                OldRule ruleValue,
+                SingleRule ruleValue,
                 JsonSerializerOptions options
             )
             {
@@ -293,7 +290,7 @@ namespace Simulation
                 writer.WritePropertyName("StateTable");
 
                 writer.WriteStartObject();
-                foreach (var k in ruleValue.ConfigurationKeys)
+                foreach (var k in ruleValue.EnumerateConfigurations())
                 {
                     var pname = k.ToString();
                     writer.WritePropertyName(options.PropertyNamingPolicy?.ConvertName(pname) ?? pname);

@@ -1,6 +1,6 @@
 namespace Simulation;
 
-public class Radius1D : Neighborhood1D
+public class Radius1D : Neighborhood
 {
     public uint Radius = 1;
     public uint LookBack = 0;
@@ -26,6 +26,7 @@ public class Radius1D : Neighborhood1D
         foreach (var state in segment)
         {
             ret[idx] = state.Get(index);
+            idx++;
             for (int i = 1; i <= Radius; i++)
             {
                 ret[idx] = state.Get(index - i);

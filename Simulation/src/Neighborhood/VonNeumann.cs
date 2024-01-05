@@ -2,73 +2,100 @@
 using System;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Data;
 
 namespace Simulation
 {
     [JsonConverter(typeof(Json.VonNeumannConverter))]
-    public class VonNeumann : Neighborhood
+    public class VonNeumann : Neighborhood2D
     {
         public uint Radius = 1;
 
-        public VonNeumann(uint radius = 1)
+        public VonNeumann(uint radius = 1, uint lookBack = 0, int rows = 1, int cols = 1)
         {
+            this.Rows = rows;
+            this.Columns = cols;
             this.Radius = radius;
+            this.LookBack = lookBack;
         }
 
-        public override uint Count2D()
+        public override uint Count()
         {
             uint ret = 1 + (Radius * 4);
             for (uint i = 1; i < Radius; i++) ret += i * 4;
-            return ret;
+            return ret * (LookBack + 1);
         }
 
-        public override uint Count1D()
-            => (Radius * 2) + 1;
-
-        public override State[] Get2D(Container.Grid2D<State>.View gridState, int row, int column)
+        public override State[] Get(Container.Array<State>.View[] states, int index)
         {
-            var count = Count2D();
+            var count = Count();
             State[] configuration = new State[count];
+            var segment = new ArraySegment<Container.Array<State>.View>
+                (states, 0, Math.Min((int)LookBack + 1, states.Length));
 
-            configuration[0] = gridState.Get(row, column);
-            int idx = 1;
+            int idx = 0;
 
-            for (int i = 1; i <= Radius; i++)
-                for (int j = 0; j < i; j++)
-                {
-                    var r = -i + j;
-                    var c = j;
-                    configuration[idx] = gridState.Get(row + r, column + c);
-                    idx++;
+            int row = GetRowFromKey(index);
+            int column = GetColumnFromKey(index);
 
-                    configuration[idx] = gridState.Get(row + c, column - r);
-                    idx++;
+            foreach (var state in segment)
+            {
+                configuration[idx] = state.Get(index);
+                idx++;
 
-                    configuration[idx] = gridState.Get(row - r, column - c);
-                    idx++;
+                for (int i = 1; i <= Radius; i++)
+                    for (int j = 0; j < i; j++)
+                    {
+                        var r = -i + j;
+                        var c = j;
+                        configuration[idx] = state.Get(GetKeyFromCoords(row + r, column + c));
+                        idx++;
 
-                    configuration[idx] = gridState.Get(row - c, column + r);
-                    idx++;
-                }
+                        configuration[idx] = state.Get(GetKeyFromCoords(row + c, column - r));
+                        idx++;
 
+                        configuration[idx] = state.Get(GetKeyFromCoords(row - r, column - c));
+                        idx++;
+
+                        configuration[idx] = state.Get(GetKeyFromCoords(row - c, column + r));
+                        idx++;
+                    }
+            }
 
             return configuration;
         }
 
-        public override State[] Get1D(Container.Array<State>.View state, int index)
+        public override State[] Get(Container.Grid2D<State>[] states, int row, int column)
         {
-            var count = Count1D();
+            var count = Count();
             State[] configuration = new State[count];
+            var segment = new ArraySegment<Container.Grid2D<State>>
+                (states, 0, Math.Min((int)LookBack + 1, states.Length));
 
-            configuration[0] = state.Get(index);
-            var idx = 1;
+            int idx = 0;
 
-            for (int i = 1; i <= Radius; i++)
+            foreach (var state in segment)
             {
-                configuration[idx] = state.Get(index - i);
+                configuration[idx] = state.Get(row, column);
                 idx++;
-                configuration[idx] = state.Get(index + i);
-                idx++;
+
+                for (int i = 1; i <= Radius; i++)
+                    for (int j = 0; j < i; j++)
+                    {
+                        var r = -i + j;
+                        var c = j;
+                        configuration[idx] = state.Get(row + r, column + c);
+                        idx++;
+
+                        configuration[idx] = state.Get(row + c, column - r);
+                        idx++;
+
+                        configuration[idx] = state.Get(row - r, column - c);
+                        idx++;
+
+                        configuration[idx] = state.Get(row - c, column + r);
+                        idx++;
+                    }
             }
 
             return configuration;
@@ -76,19 +103,9 @@ namespace Simulation
 
         public State[] Convert(State[] input, State defaultValue)
         {
-            var count = Count2D();
-            var ret = Enumerable.Range(1, (int)Count2D()).Select(_ => (State)defaultValue.Clone()).ToArray();
+            var count = Count();
+            var ret = Enumerable.Range(1, (int)Count()).Select(_ => (State)defaultValue.Clone()).ToArray();
             Array.Copy(input, 0, ret, 0, input.Length);
-            return ret;
-        }
-
-        public override ConfigurationKey ConvertKey(ConfigurationKey input, State defaultValue)
-        {
-            var config = Enumerable.Range(1, (int)Count2D()).Select(_ => (State)defaultValue.Clone()).ToArray();
-            var ret = Encode(config);
-
-            Array.Copy(input.Bytes, 0, ret.Bytes, 0, Math.Min(input.Bytes.Length, ret.Bytes.Length));
-
             return ret;
         }
     }

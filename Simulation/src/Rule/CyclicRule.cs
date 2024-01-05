@@ -26,10 +26,15 @@ public class CyclicRule : MetaRule
     public override void SetStatesCount(int v) => CurrentRule.SetStatesCount(v);
     public override int GetBitsCount() => CurrentRule.GetBitsCount();
     public override void SetBitsCount(int v) => CurrentRule.SetBitsCount(v);
-    public override Neighborhood1D GetNeighborhood() => CurrentRule.GetNeighborhood();
-    public override void SetNeighborhood(Neighborhood1D v) => CurrentRule.SetNeighborhood(v);
-
+    public override Neighborhood GetNeighborhood() => CurrentRule.GetNeighborhood();
+    public override void SetNeighborhood(Neighborhood v) => CurrentRule.SetNeighborhood(v);
+    public override IEnumerable<State[]> EnumerateConfigurations() => CurrentRule.EnumerateConfigurations();
 
     public override State Get(State[] config) => CurrentRule.Get(config);
     public override double[] Distribution(State[] config) => CurrentRule.Distribution(config);
+
+    public override double AverageDifference(SingleRule other) => CurrentRule.AverageDifference(other);
+    
+    public override double AverageVariance() => CurrentRule.AverageVariance();
+
 }

@@ -34,7 +34,7 @@ public partial class Demo1D : Control
         {
             states = new();
             states.Add(originalSimulation.GetCurrentStateView());
-            originalSimulation.Rule = SingleRule.Random1D(new Radius1D(2, 2), 3);
+            originalSimulation.Rule = SingleRule.Random(new Radius1D(2, 2), 3);
         }
 
         Advance();

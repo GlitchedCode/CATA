@@ -1,33 +1,70 @@
 namespace Simulation;
 
 using System;
+using Godot;
 
 public class Model2D
 {
-    public OldRule Rule;
-    Container.Grid2D<State> gridState;
-    Container.Grid2D<State> previousGridState;
+    public int Rows { get; protected set; }
+    public int Columns { get; protected set; }
+
+    Rule _rule = null;
+    Neighborhood2D Neighborhood = null;
+    public Rule Rule
+    {
+        get => _rule;
+        set
+        {
+            _rule = value;
+            if (value != null)
+            {
+                Neighborhood = value.Neighborhood as Neighborhood2D;
+                if (Neighborhood != null)
+                {
+                    Neighborhood.Rows = Rows;
+                    Neighborhood.Columns = Columns;
+                }
+            }
+            else
+            {
+                Neighborhood = null;
+            }
+        }
+    }
+
+    int maxStateHistory;
+    List<Container.Grid2D<State>> stateHistory = new();
+    Container.Grid2D<State> currentState;
 
     public State DefaultState = new State(1, 0);
 
-    public Model2D(int rows, int cols)
+    public Model2D(int rows, int cols, int maxStateHistory = 1)
     {
-        Rule = new(2);
-        gridState = new(rows, cols, DefaultState);
-        previousGridState = new(rows, cols, DefaultState);
+        if (maxStateHistory < 1)
+            this.maxStateHistory = 1;
+        else
+            this.maxStateHistory = maxStateHistory;
+
+        Rule = new SingleRule(2);
+        currentState = new(rows, cols, DefaultState);
+        Resize(rows, cols);
     }
 
     public void Advance()
     {
-        previousGridState = gridState;
-        gridState = new(previousGridState.Rows, previousGridState.Columns, DefaultState);
-        for (int r = 0; r < gridState.Rows; ++r)
-            for (int c = 0; c < gridState.Columns; ++c)
+        stateHistory.Add(currentState);
+        var diff = stateHistory.Count - maxStateHistory;
+        if (diff > 0)
+            stateHistory.RemoveRange(0, diff);
+
+        currentState = new(stateHistory[0].Rows, stateHistory[0].Columns, DefaultState);
+
+        for (int r = 0; r < currentState.Rows; ++r)
+            for (int c = 0; c < currentState.Columns; ++c)
             {
                 // von neumann
-                var configuration = Rule.Neighborhood.Get2D(previousGridState.GetView(), r, c);
-                var configKey = Neighborhood.Encode(configuration);
-                gridState.Set(r, c, Rule.Get(configKey));
+                State[] configuration = Neighborhood.Get(stateHistory.ToArray(), r, c);
+                currentState.Set(r, c, Rule.Get(configuration));
             }
     }
 
@@ -35,13 +72,13 @@ public class Model2D
     {
         Random rng = new Random();
 
-        for (int r = 0; r < gridState.Rows; ++r)
-            for (int c = 0; c < gridState.Columns; ++c)
-                gridState.Set(r, c, new State(Rule.BitsCount, rng.Next(Rule.StatesCount)));
+        for (int r = 0; r < currentState.Rows; ++r)
+            for (int c = 0; c < currentState.Columns; ++c)
+                currentState.Set(r, c, new State(Rule.BitsCount, rng.Next(Rule.StatesCount)));
     }
 
     public void Set(int row, int column, State state)
-        => this.gridState.Set(row, column, state);
+        => this.currentState.Set(row, column, state);
 
     public void ResetState(Container.Grid2D<State>.View state = null)
     {
@@ -56,11 +93,12 @@ public class Model2D
 
     public void Resize(int rows, int cols)
     {
-        gridState.Resize(rows, cols);
-        previousGridState.Resize(rows, cols);
+        currentState.Resize(rows, cols);
+        ResetState(currentState.GetView());
+        Rows = rows;
+        Columns = cols;
     }
 
-    public Container.Grid2D<State>.View GetCurrentStateView() => gridState.GetView();
-    public Container.Grid2D<State>.View GetPreviousStateView() => previousGridState.GetView();
+    public Container.Grid2D<State>.View GetCurrentStateView() => currentState.GetView();
 }
 
