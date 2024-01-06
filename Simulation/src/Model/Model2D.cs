@@ -1,7 +1,6 @@
 namespace Simulation;
 
 using System;
-using Godot;
 
 public class Model2D
 {

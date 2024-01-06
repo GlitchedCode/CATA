@@ -4,9 +4,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CATA", "CATA.csproj", "{5AA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulation", "Simulation\Simulation.csproj", "{6812D544-459E-4B03-A345-57A9FB9F1C4F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MidiAnalyzer", "MidiAnalyzer", "{AD27B58F-83F5-467B-81C1-CFA8DD1C1025}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Programs", "Programs", "{AD27B58F-83F5-467B-81C1-CFA8DD1C1025}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiAnalyzer", "MidiAnalyzer\MidiAnalyzer\MidiAnalyzer.csproj", "{77AA558B-9C80-436A-A650-827A60BCC53A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Programs", "Programs\MidiAnalyzer\MidiAnalyzer.csproj", "{77AA558B-9C80-436A-A650-827A60BCC53A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
