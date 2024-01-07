@@ -8,6 +8,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Programs", "Programs", "{AD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Programs", "Programs\MidiAnalyzer\MidiAnalyzer.csproj", "{77AA558B-9C80-436A-A650-827A60BCC53A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compression", "Programs\Compression\Compression.csproj", "{1F71BD89-B78B-403E-B715-7EB9AE06EE8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,8 +47,15 @@ Global
 		{77AA558B-9C80-436A-A650-827A60BCC53A}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{77AA558B-9C80-436A-A650-827A60BCC53A}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{77AA558B-9C80-436A-A650-827A60BCC53A}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{1F71BD89-B78B-403E-B715-7EB9AE06EE8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F71BD89-B78B-403E-B715-7EB9AE06EE8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F71BD89-B78B-403E-B715-7EB9AE06EE8F}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F71BD89-B78B-403E-B715-7EB9AE06EE8F}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{1F71BD89-B78B-403E-B715-7EB9AE06EE8F}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F71BD89-B78B-403E-B715-7EB9AE06EE8F}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{77AA558B-9C80-436A-A650-827A60BCC53A} = {AD27B58F-83F5-467B-81C1-CFA8DD1C1025}
+		{1F71BD89-B78B-403E-B715-7EB9AE06EE8F} = {AD27B58F-83F5-467B-81C1-CFA8DD1C1025}
 	EndGlobalSection
 EndGlobal
