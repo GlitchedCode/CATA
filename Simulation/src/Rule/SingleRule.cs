@@ -44,6 +44,9 @@ namespace Simulation
         public void Unset(State[] config)
             => stateTable.Unset(config);
 
+        public bool Contains(State[] config)
+            => stateTable.Contains(config);
+
         public void Reset()
         {
             stateTable.Clear();

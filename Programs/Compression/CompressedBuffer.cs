@@ -24,12 +24,16 @@ class CompressedBuffer
                 .Get(dynamics.Take(lookback + 1).ToArray(), 0);
             var expected = dynamics[lookback + 1].Get(0).Value;
 
-            var dist = rule.Distribution(neighborhood);
-            if ((dist[0] != 0 || dist[1] != 0) && dist[expected] == 0)
-                break;
+            if (rule.Contains(neighborhood))
+            {
+                var dist = rule.Distribution(neighborhood);
+                if (dist[expected] == 0)
+                    break;
+            }
 
             rule.Set(neighborhood, expected);
             dynamics.RemoveAt(0);
+            count++;
         }
 
         return (count, rule);
@@ -39,7 +43,7 @@ class CompressedBuffer
     {
         this.lookback = lookback;
         generationLength = buffer.Length - lookback - 1;
-        if(generationLength < 0)
+        if (generationLength < 0)
             throw new Exception("invalid params");
 
         var dynamics = new List<Array<State>.View>(buffer.Select(b =>
@@ -49,16 +53,10 @@ class CompressedBuffer
             return ret.GetView();
         }));
 
-        var past = new List<Array<State>.View>();
-        for (int i = 0; i < lookback + 1; i++)
-        {
-            past.Add(dynamics[0]);
-            dynamics.RemoveAt(0);
-        }
-        startingBuffer = past.ToArray();
+        startingBuffer = dynamics.Take(lookback + 1).ToArray();
 
         var offset = 0;
-        while(dynamics.Count > lookback + 1)
+        while (dynamics.Count > lookback + 1)
         {
             var result = Analyze(dynamics);
             rules[offset] = result.rule;
@@ -72,9 +70,9 @@ class CompressedBuffer
 
         var model = new Model1D(1, lookback + 1);
         model.ResetHistory(startingBuffer);
-        for(int i = 0; i < generationLength; i++)
+        for (int i = 0; i < generationLength; i++)
         {
-            if(rules.ContainsKey(i))
+            if (rules.ContainsKey(i))
                 model.Rule = rules[i];
 
             model.Advance();
