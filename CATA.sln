@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulation", "Simulation\Si
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Programs", "Programs", "{AD27B58F-83F5-467B-81C1-CFA8DD1C1025}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Programs", "Programs\MidiAnalyzer\MidiAnalyzer.csproj", "{77AA558B-9C80-436A-A650-827A60BCC53A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiAnalyzer", "Programs\MidiAnalyzer\MidiAnalyzer.csproj", "{77AA558B-9C80-436A-A650-827A60BCC53A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compression", "Programs\Compression\Compression.csproj", "{1F71BD89-B78B-403E-B715-7EB9AE06EE8F}"
 EndProject
