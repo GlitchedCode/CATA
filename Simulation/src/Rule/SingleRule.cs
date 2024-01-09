@@ -124,6 +124,32 @@ namespace Simulation
         public override IEnumerable<State[]> EnumerateConfigurations()
             => stateTable.EnumerateConfigurations();
 
+        public override bool Equals(object obj)
+        {
+            if(base.Equals(obj))
+                return true;
+            
+            if(!(obj is SingleRule))
+                return false;
+
+            var other = obj as SingleRule;
+            if(other.stateTable.Count != stateTable.Count
+                || other.StatesCount != StatesCount)
+                return false;
+
+            foreach(var config in EnumerateConfigurations())
+            {
+                var dist = Distribution(config);
+                if(!other.Contains(config))
+                    return false;
+                var otherdist = other.Distribution(config);
+                for(int i = 0; i < dist.Length; i++)
+                    if(dist[i] != otherdist[i])
+                        return false;
+            }
+
+            return true;
+        }
 
         /* RANDOM GENERATION */
 

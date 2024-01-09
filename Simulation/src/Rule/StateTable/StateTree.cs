@@ -38,7 +38,7 @@ public class StateTree : StateTable
             var arr = config.Array;
             var seg = new ArraySegment<State>(arr, config.Offset + 1, config.Count - 1);
             var node = children[state];
-            if(node != null) 
+            if (node != null)
                 return node.Get(seg);
             else
                 return defaultCounter;
@@ -132,12 +132,13 @@ public class StateTree : StateTable
             root.children[i] = null;
     }
 
-    IEnumerable<List<int>> EnumeratePaths(Branch root, List<int> path)
+    IEnumerable<List<int>> EnumeratePaths(Branch root, List<int> path = null)
     {
+        if (path == null) path = new();
         for (int i = 0; i < stateCount; i++)
         {
             if (root.children[i] == null) continue;
-            
+
             path.Add(i);
             if (root.children[i] is Branch)
             {
@@ -154,7 +155,7 @@ public class StateTree : StateTable
 
     public override IEnumerable<State[]> EnumerateConfigurations()
     {
-        foreach (var p in EnumeratePaths(root, new()))
+        foreach (var p in EnumeratePaths(root))
         {
             yield return p.ConvertAll((i) =>
             {
@@ -165,4 +166,7 @@ public class StateTree : StateTable
         }
         yield break;
     }
+
+    public override int GetCount()
+        => EnumeratePaths(root).Count();
 }

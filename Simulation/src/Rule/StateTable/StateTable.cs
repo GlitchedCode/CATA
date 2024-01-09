@@ -14,6 +14,12 @@ public abstract class StateTable
         get => Get(configuration);
     }
 
+    public int Count
+    {
+        get => GetCount();
+    }
+
+    public abstract int GetCount();
     public abstract bool Contains(State[] configuration);
     public abstract StateCounter Get(State[] configuration);
 

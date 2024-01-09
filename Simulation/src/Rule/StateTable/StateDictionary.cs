@@ -65,6 +65,8 @@ public class StateDictionary : StateTable
             stateTable[key] = new(StatesCount, rng);
     }
 
+    public override int GetCount()
+        => stateTable.Count;
 
     public override bool Contains(State[] configuration)
         => stateTable.ContainsKey(Encode(configuration));

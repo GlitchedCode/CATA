@@ -19,15 +19,23 @@ class Program
 
     static void Main(string[] args)
     {
-        int length = 90;
+        int length = 8192 * 2;
+        int lookback = 2;
         bool[] original = GenerateRandomBoolString(length);
 
-        Console.WriteLine("original");
-        PrintBoolString(original);
+        // Console.WriteLine("original");
+        //PrintBoolString(original);
 
-        var compressed = new CompressedBuffer(original);
+        var compressed = new CompressedBuffer(original, lookback);
 
-        Console.WriteLine("inflated");
-        PrintBoolString(compressed.Decompress());
+        compressed.PrintInfo();
+        
+        var inflated = compressed.Decompress();
+        // Console.WriteLine("inflated");
+        // PrintBoolString(inflated);
+        
+        if(Enumerable.SequenceEqual(original, inflated))
+            Console.WriteLine("they the same");
+
     }
 }
