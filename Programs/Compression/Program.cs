@@ -19,7 +19,7 @@ class Program
 
     static void Main(string[] args)
     {
-        int length = 8192 * 2;
+        int length = 100;
         int lookback = 2;
         bool[] original = GenerateRandomBoolString(length);
 

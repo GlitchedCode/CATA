@@ -151,6 +151,12 @@ namespace Simulation
             return true;
         }
 
+        public void Optimize()
+        {
+            var tree = stateTable as StateTree;
+            if(tree != null) tree.Optimize();
+        }
+
         /* RANDOM GENERATION */
 
         public static SingleRule Random(IEnumerable<State[]> configurations, int stateCount, Random rng = null)

@@ -169,4 +169,41 @@ public class StateTree : StateTable
 
     public override int GetCount()
         => EnumeratePaths(root).Count();
+
+    void recursiveOptimize(Branch root)
+    {
+        for (int i = 0; i < stateCount; i++)
+        {
+            var child = root.children[i] as Branch;
+            if (child == null) continue;
+
+            var values = new List<int>();
+            var leaves = true;
+
+            foreach (var nephew in child.children)
+            {
+                var leaf = nephew as Leaf;
+                if (leaf != null)
+                    values.Add(leaf.state.Get());
+                else
+                    leaves = false;
+
+                var branch = nephew as Branch;
+                if (branch != null)
+                    recursiveOptimize(branch);
+            }
+
+            if (leaves && values.Count > 0 && values.TrueForAll(v => v == values[0]))
+            {
+                var counter = new StateCounter(stateCount);
+                counter.Set(values[0]);
+                root.children[i] = new Leaf(counter);
+            }
+        }
+    }
+
+    public void Optimize()
+    {
+        for (int i = 0; i < 10; i++) recursiveOptimize(root);
+    }
 }

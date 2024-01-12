@@ -11,13 +11,17 @@ public class CompressionRule : MetaRule
     public int RuleCount { get => rules.Length; }
     public int MasterConfigsCount { get => master.EnumerateConfigurations().Count(); }
     public int SegmentCount { get => offsetTable.Count; }
-    public int PathCount
+    public int PathBitCount
     {
         get
         {
             var ret = 0;
-            foreach (var rule in rules) ret += rule.EnumerateConfigurations().Count();
-            ret += master.EnumerateConfigurations().Count();
+            foreach (var rule in rules)
+                foreach (var path in rule.EnumerateConfigurations())
+                    ret += path.Length;
+            
+            foreach (var path in master.EnumerateConfigurations())
+                ret += path.Length;
             return ret;
         }
     }
@@ -56,7 +60,7 @@ public class CompressionRule : MetaRule
         => CurrentRule.Contains(config) ? CurrentRule : master;
 
     public override State Get(State[] config)
-        => getRule(config).Get(config);
+        => CurrentRule.Get(config);
 
     public override double[] Distribution(State[] config) => getRule(config).Distribution(config);
 
@@ -67,5 +71,9 @@ public class CompressionRule : MetaRule
         => CurrentRule.AverageVariance() + master.AverageVariance();
 
 
-
+    public void Optimize()
+    {
+        master.Optimize();
+        foreach (var rule in rules) rule.Optimize();
+    }
 }

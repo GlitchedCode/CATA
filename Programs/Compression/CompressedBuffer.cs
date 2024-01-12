@@ -101,6 +101,7 @@ class CompressedBuffer
         }
 
         rule = new Simulation.CompressionRule(master, rules.ToArray(), offsetTable);
+        //rule.Optimize();
 
         List<SingleRule> dedupeRules(List<SingleRule> rules)
         {
@@ -166,7 +167,8 @@ class CompressedBuffer
         Console.WriteLine($"segment count: {rule.SegmentCount}");
         Console.WriteLine($"master configs count: {rule.MasterConfigsCount}");
 
-        Console.WriteLine($"approx rules bit count: {rule.PathCount * (lookback + 1)}");
-        Console.WriteLine($"approx segment bit count: {rule.SegmentCount * 16}");
+        
+        Console.WriteLine($"approx rules bit count: {rule.PathBitCount}");
+        Console.WriteLine($"approx segment bit count: {rule.SegmentCount * 32}");
     }
 }
