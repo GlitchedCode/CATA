@@ -146,6 +146,7 @@ class CompressedBuffer
         var ret = new List<bool>(startingBuffer.Select(v => v.Get(0).Value == 1));
 
         var model = new Model1D(1, lookback + 1);
+        model.Rule = rule;
         model.ResetHistory(startingBuffer);
         for (int i = 0; i < generationLength; i++)
         {

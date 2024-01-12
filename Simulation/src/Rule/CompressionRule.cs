@@ -31,6 +31,7 @@ public class CompressionRule : MetaRule
         this.master = master;
         this.rules = rules;
         this.offsetTable = offsetTable;
+        Advance();
     }
 
     public override void Advance()

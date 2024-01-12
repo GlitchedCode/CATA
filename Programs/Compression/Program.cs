@@ -24,7 +24,7 @@ class Program
         bool[] original = GenerateRandomBoolString(length);
 
         // Console.WriteLine("original");
-        //PrintBoolString(original);
+        // PrintBoolString(original);
 
         var compressed = new CompressedBuffer(original, lookback);
 
