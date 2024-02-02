@@ -19,12 +19,33 @@ public class CompressionRule : MetaRule
             foreach (var rule in rules)
                 foreach (var path in rule.EnumerateConfigurations())
                     ret += path.Length;
-            
+
             foreach (var path in master.EnumerateConfigurations())
                 ret += path.Length;
             return ret;
         }
     }
+
+    public double AverageSegmentLength
+    {
+        get
+        {
+            var acc = 0d;
+            var count = 0;
+
+            var last = offsetTable.Keys.First();
+            foreach (var offset in offsetTable.Keys.Skip(1))
+            {
+                acc += offset - last;
+                last = offset;
+                count++;
+            }
+
+            return acc / count;
+        }
+    }
+
+    public IEnumerable<SingleRule> Rules { get => rules; }
 
     SingleRule CurrentRule { get => rules[ruleIndex]; }
     int ruleIndex = -1;
@@ -76,4 +97,6 @@ public class CompressionRule : MetaRule
         master.Optimize();
         foreach (var rule in rules) rule.Optimize();
     }
+
+
 }

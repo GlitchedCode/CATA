@@ -27,10 +27,10 @@ public class Model1D
 
     public void Advance()
     {
-        stateHistory.Add(currentState.GetView());
+        stateHistory.Insert(0, currentState.GetView());
         var diff = stateHistory.Count - maxStateHistory;
         if (diff > 0)
-            stateHistory.RemoveRange(0, diff);
+            stateHistory.RemoveRange(maxStateHistory, diff);
 
         currentState = new(stateHistory[0].CellCount, DefaultState);
         for (int i = 0; i < currentState.CellCount; ++i)

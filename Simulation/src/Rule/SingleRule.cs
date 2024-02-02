@@ -126,25 +126,25 @@ namespace Simulation
 
         public override bool Equals(object obj)
         {
-            if(base.Equals(obj))
+            if (base.Equals(obj))
                 return true;
-            
-            if(!(obj is SingleRule))
+
+            if (!(obj is SingleRule))
                 return false;
 
             var other = obj as SingleRule;
-            if(other.stateTable.Count != stateTable.Count
+            if (other.stateTable.Count != stateTable.Count
                 || other.StatesCount != StatesCount)
                 return false;
 
-            foreach(var config in EnumerateConfigurations())
+            foreach (var config in EnumerateConfigurations())
             {
                 var dist = Distribution(config);
-                if(!other.Contains(config))
+                if (!other.Contains(config))
                     return false;
                 var otherdist = other.Distribution(config);
-                for(int i = 0; i < dist.Length; i++)
-                    if(dist[i] != otherdist[i])
+                for (int i = 0; i < dist.Length; i++)
+                    if (dist[i] != otherdist[i])
                         return false;
             }
 
@@ -154,9 +154,18 @@ namespace Simulation
         public void Optimize()
         {
             var tree = stateTable as StateTree;
-            if(tree != null) tree.Optimize();
+            if (tree != null) tree.Optimize();
         }
-
+        
+        public IEnumerable<int> GetBits()
+        {
+            var ret = new List<int>();
+            foreach (var cfg in Neighborhood.EnumerateConfigurations(2))
+            {
+                ret.Add((int)stateTable.Get(cfg).Distribution()[1]);
+            }
+            return ret;
+        }
         /* RANDOM GENERATION */
 
         public static SingleRule Random(IEnumerable<State[]> configurations, int stateCount, Random rng = null)
@@ -301,7 +310,7 @@ namespace Simulation
                 {
                     var dist = distributionTable[k];
                     for (int i = 0; i < dist.Length; i++)
-                        ret.Increment(OldNeighborhood.Decode(k, (int)Math.Ceiling(Math.Log2(stateCount))), 
+                        ret.Increment(OldNeighborhood.Decode(k, (int)Math.Ceiling(Math.Log2(stateCount))),
                         i, (uint)(samples * dist[i]));
                 }
 
