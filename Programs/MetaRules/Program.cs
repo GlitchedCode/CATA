@@ -1,5 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Simulation;
+using Plotly.NET.CSharp;
+using Plotly.NET.ImageExport;
+
+using StateView = Simulation.Container.Array<Simulation.State>.View;
 
 public class MetaRulesProgram
 {
@@ -13,14 +17,22 @@ public class MetaRulesProgram
     rule.Randomize();
     simulation.Rule = rule;
 
-    for(int i = 0; i < 80; i++)
+    var states = new List<Simulation.State[]>();
+    states.Add(simulation.GetCurrentStateView().ToArray());
+    for(int i = 0; i < 200; i++)
     {
-      simulation.GetCurrentStateView().Print(".vx#");
       simulation.Advance();
       rule.Advance();
+      states.Add(simulation.GetCurrentStateView().ToArray());
     }
-    simulation.GetCurrentStateView().Print(".vx#");
 
+    var mat = new List<float[]>();
+    foreach (var s in states)
+      mat.Add(s.Select((state) => (float)state.Value / ((float)rule.StatesCount-1)).ToArray());
+
+    Chart.Heatmap<float, int, int, string>(
+      zData: mat.ToArray()
+    ).SavePNG("test.html");
 
     return 0;
   }

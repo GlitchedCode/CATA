@@ -15,5 +15,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+.netcoredbg_hist
 
 **.import

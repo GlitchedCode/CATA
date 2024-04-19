@@ -83,6 +83,13 @@ public class Array<T> : ICloneable
     return ret;
   }
 
+  public T[] ToArray()
+  {
+    var vals = new List<T>();
+    for(int i = 0; i < CellCount; i++)
+      vals.Add(Get(i));
+    return vals.ToArray();
+  }
 
   public class View
   {
@@ -94,6 +101,7 @@ public class Array<T> : ICloneable
     public View(Array<T> cont) => container = cont;
 
     public T Get(int index) => container.Get(index);
+    public T[] ToArray() => container.ToArray();
 
     public void Print(string charmap = null)
     {

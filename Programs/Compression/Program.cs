@@ -1,6 +1,6 @@
-﻿using System.Reflection.Metadata;
+﻿using Simulation;
 
-class Program
+class CompressionProgram
 {
     static bool[] GenerateRandomBoolString(int length)
     {

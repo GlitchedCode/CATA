@@ -1,7 +1,6 @@
 ﻿namespace MidiAnalyzer;
 
 using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
@@ -9,7 +8,7 @@ using Simulation;
 
 using SimState = Simulation.Container.Array<Simulation.State>;
 
-class Program
+class MidiAnalyzerProgram
 {
     static void ReplaceMidiEvents(MidiFile file, int track, int channel, int dtMul, List<SimState.View> states)
     {

@@ -13,6 +13,12 @@ public class Model1D
 
     public State DefaultState = new State(1, 0);
 
+    UpdateMask _updateMask = new();
+    public UpdateMask UpdateMask {
+      get => _updateMask;
+      set => _updateMask = value == null ? new() : value;
+    }
+
     public Model1D(int cellCount, int maxStateHistory = 1)
     {
         if (maxStateHistory < 1)
@@ -35,9 +41,12 @@ public class Model1D
         currentState = new(stateHistory[0].CellCount, DefaultState);
         for (int i = 0; i < currentState.CellCount; ++i)
         {
+            if(!UpdateMask.Get(i)) continue;
             var configuration = Rule.Neighborhood.Get(stateHistory.ToArray(), i);
             currentState.Set(i, Rule.Get(configuration));
         }
+
+        UpdateMask.Advance();
     }
 
     public void Randomize()
@@ -57,7 +66,7 @@ public class Model1D
         var okState = (int i) => state.Get(i);
         var getState = state == null ? nullState : okState;
 
-        for (int i = 0; i < state.CellCount; ++i)
+        for (int i = 0; i < currentState.CellCount; ++i)
             Set(i, getState(i));
     }
 

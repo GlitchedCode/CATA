@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <PackageReference Include="Melanchall.DryWetMidi" Version="7.0.1" />
+    <PackageReference Include="Plotly.NET.CSharp" Version="0.11.1" />
+    <PackageReference Include="Plotly.NET.Interactive" Version="4.2.1" />
   </ItemGroup>
 
   <PropertyGroup>
