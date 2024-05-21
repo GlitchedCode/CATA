@@ -7,6 +7,10 @@ public abstract class Neighborhood
     public abstract uint Count();
 
     public abstract State[] Get(Container.Array<State>.View[] states, int index);
+    public State[] Get(Container.Array<State>.View state, int index)
+    {
+      return Get(new Container.Array<State>.View[] {state}, index);
+    }
 
     public static ConfigurationKey Encode(State[] configuration)
     {

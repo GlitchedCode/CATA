@@ -24,4 +24,8 @@ public abstract class Neighborhood2D : Neighborhood
         (row * Columns) + col;
 
     public abstract State[] Get(Container.Grid2D<State>[] states, int row, int column);
+    public State[] Get(Container.Grid2D<State> state, int row, int column)
+    {
+      return Get(new Container.Grid2D<State>[] {state}, row, column);
+    }
 }
