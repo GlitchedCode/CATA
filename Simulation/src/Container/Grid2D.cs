@@ -111,5 +111,17 @@ public class Grid2D<T> : Array<T>
 
         private int GetKeyFromCoords(int row, int col) =>
             (row * Columns) + col;
+
+        public T[][] ToMatrix() {
+          var ret = new List<T[]>();
+          for(int r = 0; r < Rows; r++)
+          {
+            var row = new List<T>();
+            for(int c = 0; c < Columns; c++)
+              row.Add(Get(r,c));
+            ret.Add(row.ToArray());
+          }
+          return ret.ToArray();
+        }
     }
 }

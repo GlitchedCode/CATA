@@ -5,7 +5,6 @@ namespace Analysis;
 public class OuterTotalisticTest : CATest {
   
   public Neighborhood neighborhood; 
-  public bool outer = false;
 
   public  bool Test(Simulation.Container.Array<State>.View[] dynamics)
   {

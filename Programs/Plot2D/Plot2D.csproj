@@ -14,8 +14,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Plotly.NET.CSharp" Version="0.11.1" />
-    <PackageReference Include="Plotly.NET.Interactive" Version="4.2.1" />
+    <PackageReference Include="Plotly.NET.CSharp" Version="0.12.0" />
+    <PackageReference Include="Plotly.NET.ImageExport" Version="6.0.0" />
+    <PackageReference Include="Plotly.NET.Interactive" Version="5.0.0" />
     <PackageReference Include="xunit" Version="2.6.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
   </ItemGroup>
