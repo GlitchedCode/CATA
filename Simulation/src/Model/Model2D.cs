@@ -7,27 +7,13 @@ public class Model2D
     public int Rows { get; protected set; }
     public int Columns { get; protected set; }
 
-    Rule _rule = null;
-    Neighborhood2D Neighborhood = null;
-    public Rule Rule
+    MetaRule _rule = null;
+    public MetaRule Rule
     {
         get => _rule;
         set
         {
             _rule = value;
-            if (value != null)
-            {
-                Neighborhood = value.Neighborhood as Neighborhood2D;
-                if (Neighborhood != null)
-                {
-                    Neighborhood.Rows = Rows;
-                    Neighborhood.Columns = Columns;
-                }
-            }
-            else
-            {
-                Neighborhood = null;
-            }
         }
     }
 
@@ -44,7 +30,7 @@ public class Model2D
         else
             this.maxStateHistory = maxStateHistory;
 
-        Rule = new SingleRule(2);
+        Rule = new TableRule(2);
         currentState = new(rows, cols, DefaultState);
         Resize(rows, cols);
     }

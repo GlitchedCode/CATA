@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class Model1D
 {
-    public Rule Rule;
+    public MetaRule Rule;
 
     int maxStateHistory;
     List<Container.Array<State>.View> stateHistory = new();
@@ -26,7 +26,7 @@ public class Model1D
         else
             this.maxStateHistory = maxStateHistory;
 
-        Rule = new SingleRule(2);
+        Rule = new TableRule(2);
         currentState = new(cellCount, DefaultState);
         ResetState(currentState.GetView());
     }
@@ -42,8 +42,9 @@ public class Model1D
         for (int i = 0; i < currentState.CellCount; ++i)
         {
             if(!UpdateMask.Get(i)) continue;
-            var configuration = Rule.Neighborhood.Get(stateHistory.ToArray(), i);
-            currentState.Set(i, Rule.Get(configuration));
+            var rule = Rule.GetCurrentRule(i);
+            var configuration = rule.Neighborhood.Get(stateHistory.ToArray(), i);
+            currentState.Set(i, rule.Get(configuration));
         }
 
         UpdateMask.Advance();
@@ -54,7 +55,7 @@ public class Model1D
         Random rng = new Random();
 
         for (int i = 0; i < currentState.CellCount; ++i)
-            currentState.Set(i, new State(Rule.BitsCount, rng.Next(Rule.StatesCount)));
+            currentState.Set(i, new State(Rule.CurrentRule.BitsCount, rng.Next(Rule.CurrentRule.StatesCount)));
     }
 
     public void Set(int index, State state)
@@ -62,7 +63,7 @@ public class Model1D
 
     public void ResetState(Container.Array<State>.View state = null)
     {
-        var nullState = (int i) => new State(Rule.BitsCount, 0);
+        var nullState = (int i) => new State(Rule.CurrentRule.BitsCount, 0);
         var okState = (int i) => state.Get(i);
         var getState = state == null ? nullState : okState;
 

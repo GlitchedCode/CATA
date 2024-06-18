@@ -1,6 +1,6 @@
 namespace Simulation;
 
-public abstract class Rule
+public abstract class Rule : MetaRule
 {
     public int DefaultState
     {
@@ -44,6 +44,7 @@ public abstract class Rule
 
     public abstract State Get(State[] configuration);
     public abstract double[] Distribution(State[] configuration);
-    public abstract double AverageDifference(SingleRule other);
-    public abstract double AverageVariance();
+
+    public sealed override void Advance() {}
+    public sealed override Rule GetCurrentRule(int position) => this;
 }

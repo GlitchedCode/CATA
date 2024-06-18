@@ -19,7 +19,36 @@ class Plot2DProgram
     var simulation = new Model2D(100, 100);
   
     var neighborhood = new VonNeumann(1);
-    var lifeRule = RuleBuilder.OuterTotalistic(2, neighborhood, new int[]{0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0});
+    var lifeRule = new TotalisticRule(2, neighborhood, true);
+    var two = new State[] { 
+      new State(1), 
+      new State(0),
+      new State(1), // 2
+      new State(0), 
+      new State(0),
+      new State(0),
+      new State(0),
+      new State(0),
+      new State(0),
+    };
+    var three = new State[] { 
+      new State(0), 
+      new State(0),
+      new State(0),
+      new State(1), // 3
+      new State(0),
+      new State(0),
+      new State(0),
+      new State(0),
+      new State(0),
+    };
+
+    // B3
+    lifeRule.Increment(three, 1);
+    // S23
+    three[0].Value = 1;
+    lifeRule.Increment(two, 1);
+    lifeRule.Increment(three, 1);
 
     simulation.Rule = lifeRule;
     simulation.Randomize();

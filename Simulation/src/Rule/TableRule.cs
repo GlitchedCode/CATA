@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace Simulation
 {
     [JsonConverter(typeof(Json.PastStateRuleConverter))]
-    public class SingleRule : Rule, ICloneable
+    public class TableRule : Rule, ICloneable
     {
         StateTable stateTable;
         int _StatesCount;
@@ -28,7 +28,7 @@ namespace Simulation
         //public override IEnumerable<ConfigurationKey> GetConfigurationKeys() => stateTable.Keys;
 
 
-        public SingleRule(int statesCount, int defaultState = 0)
+        public TableRule(int statesCount, int defaultState = 0)
         {
             _StatesCount = statesCount;
             stateTable = new StateTree(statesCount, rng);
@@ -55,9 +55,9 @@ namespace Simulation
         public override State Get(State[] config)
             => new State(BitsCount, stateTable.Get(config).Get());
 
-        public static SingleRule operator +(SingleRule a, SingleRule b)
+        public static TableRule operator +(TableRule a, TableRule b)
         {
-            var ret = (SingleRule)a.Clone();
+            var ret = (TableRule)a.Clone();
 
             foreach (var k in b.stateTable.EnumerateConfigurations())
             {
@@ -75,7 +75,7 @@ namespace Simulation
         public double Variance(State[] config)
             => stateTable[config].Variance();
 
-        public override double AverageDifference(SingleRule other)
+        public double AverageDifference(TableRule other)
         {
             var ret = 0d;
             var count = 0d;
@@ -94,7 +94,7 @@ namespace Simulation
             return ret / count;
         }
 
-        public override double AverageVariance()
+        public double AverageVariance()
         {
             var ret = 0d;
             var count = 0d;
@@ -110,7 +110,7 @@ namespace Simulation
 
         public object Clone()
         {
-            var ret = new SingleRule(StatesCount, DefaultState);
+            var ret = new TableRule(StatesCount, DefaultState);
             ret.Neighborhood = Neighborhood;
             foreach (var config in stateTable.EnumerateConfigurations())
             {
@@ -129,10 +129,10 @@ namespace Simulation
             if (base.Equals(obj))
                 return true;
 
-            if (!(obj is SingleRule))
+            if (!(obj is TableRule))
                 return false;
 
-            var other = obj as SingleRule;
+            var other = obj as TableRule;
             if (other.stateTable.Count != stateTable.Count
                 || other.StatesCount != StatesCount)
                 return false;
@@ -168,11 +168,11 @@ namespace Simulation
         }
         /* RANDOM GENERATION */
 
-        public static SingleRule Random(IEnumerable<State[]> configurations, int stateCount, Random rng = null)
+        public static TableRule Random(IEnumerable<State[]> configurations, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
 
-            var ret = new SingleRule(stateCount);
+            var ret = new TableRule(stateCount);
 
             foreach (var config in configurations)
             {
@@ -186,7 +186,7 @@ namespace Simulation
             return ret;
         }
 
-        public static SingleRule Random(Neighborhood neighborhood, int stateCount, Random rng = null)
+        public static TableRule Random(Neighborhood neighborhood, int stateCount, Random rng = null)
         {
             if (rng == null) rng = new Random();
             var ret = Random(neighborhood.EnumerateConfigurations(stateCount), stateCount, rng);
@@ -209,7 +209,7 @@ namespace Simulation
 
     namespace Json
     {
-        public class PastStateRuleConverter : JsonConverter<SingleRule>
+        public class PastStateRuleConverter : JsonConverter<TableRule>
         {
             static Neighborhood NeighborhoodDeserialize(
                 ref Utf8JsonReader reader,
@@ -234,7 +234,7 @@ namespace Simulation
                 return null;
             }
 
-            public override SingleRule Read(
+            public override TableRule Read(
                 ref Utf8JsonReader reader,
                 Type typeToConvert,
                 JsonSerializerOptions options
@@ -302,7 +302,7 @@ namespace Simulation
 
                 }
 
-                SingleRule ret = new(stateCount, defaultState);
+                TableRule ret = new(stateCount, defaultState);
                 ret.Neighborhood = neighborhood;
 
                 const int samples = 100000;
@@ -319,7 +319,7 @@ namespace Simulation
 
             public override void Write(
                 Utf8JsonWriter writer,
-                SingleRule ruleValue,
+                TableRule ruleValue,
                 JsonSerializerOptions options
             )
             {

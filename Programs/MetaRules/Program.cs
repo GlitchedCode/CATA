@@ -11,7 +11,7 @@ public class MetaRulesProgram
   {
     var simulation = new Model1D(200, 10);
 
-    var higherOrderRule = SingleRule.Random(new Radius1D(1), 2);
+    var higherOrderRule = TableRule.Random(new Radius1D(1), 2);
     var rule = new Model1DRule(higherOrderRule, new Radius1D(2));
     rule.Randomize();
     simulation.Rule = rule;

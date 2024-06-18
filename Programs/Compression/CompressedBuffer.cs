@@ -1,7 +1,5 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Simulation;
 using Simulation.Container;
+using Simulation;
 
 class CompressedBuffer
 {
@@ -12,9 +10,9 @@ class CompressedBuffer
     readonly int lookback;
 
 
-    (int count, SingleRule rule) Analyze(List<Array<State>.View> dynamics)
+    (int count, TableRule rule) Analyze(List<Array<State>.View> dynamics)
     {
-        SingleRule rule = new(2, 0);
+        TableRule rule = new(2, 0);
         rule.Neighborhood = new Radius1D(0, (uint)lookback);
 
         int count = 0;
@@ -59,7 +57,7 @@ class CompressedBuffer
         
         // Generate rules
         var offset = 0;
-        var rules = new List<SingleRule>();
+        var rules = new List<TableRule>();
         while (dynamics.Count > lookback + 1)
         {
             var result = Analyze(dynamics);
@@ -70,7 +68,7 @@ class CompressedBuffer
 
         rules = dedupeRules(rules);
 
-        SingleRule master = new(2, 0);
+        TableRule master = new(2, 0);
         master.Neighborhood = new Radius1D(0, (uint)lookback);
         List<State[]> ignoredConfigs = new();
         foreach (var rule in rules)
@@ -103,9 +101,9 @@ class CompressedBuffer
         rule = new Simulation.CompressionRule(master, rules.ToArray(), offsetTable);
         //rule.Optimize();
 
-        List<SingleRule> dedupeRules(List<SingleRule> rules)
+        List<TableRule> dedupeRules(List<TableRule> rules)
         {
-            var nodupe = new List<SingleRule>();
+            var nodupe = new List<TableRule>();
             for (int i = 0; i < rules.Count; i++)
             {
                 var dupe = false;
@@ -128,7 +126,7 @@ class CompressedBuffer
             return nodupe;
         }
 
-        void resetTable(List<SingleRule> orig, List<SingleRule> other)
+        void resetTable(List<TableRule> orig, List<TableRule> other)
         {
             foreach (var k in offsetTable.Keys)
                 for (int i = 0; i < other.Count; i++)

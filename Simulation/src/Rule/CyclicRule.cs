@@ -2,16 +2,18 @@ namespace Simulation;
 
 public class CyclicRule : MetaRule
 {
-    SingleRule[] rotation;
+    Rule[] rotation;
     int currentIndex = 0;
-    public SingleRule CurrentRule { get => rotation[currentIndex]; }
 
-    public CyclicRule(IEnumerable<SingleRule> rotation)
+    public override Rule GetCurrentRule(int position)
+        => rotation[currentIndex];
+
+    public CyclicRule(IEnumerable<Rule> rotation)
     {
         SetRotation(rotation);
     }
 
-    public void SetRotation(IEnumerable<SingleRule> rotation)
+    public void SetRotation(IEnumerable<Rule> rotation)
     {
         this.rotation = rotation.ToArray();
         currentIndex = 0;
@@ -19,22 +21,5 @@ public class CyclicRule : MetaRule
 
     public override void Advance()
         => currentIndex = (currentIndex + 1) % rotation.Length;
-
-    public override int GetDefaultState() => CurrentRule.GetDefaultState();
-    public override void SetDefaultState(int v) => CurrentRule.SetDefaultState(v);
-    public override int GetStatesCount() => CurrentRule.GetStatesCount();
-    public override void SetStatesCount(int v) => CurrentRule.SetStatesCount(v);
-    public override int GetBitsCount() => CurrentRule.GetBitsCount();
-    public override void SetBitsCount(int v) => CurrentRule.SetBitsCount(v);
-    public override Neighborhood GetNeighborhood() => CurrentRule.GetNeighborhood();
-    public override void SetNeighborhood(Neighborhood v) => CurrentRule.SetNeighborhood(v);
-    public override IEnumerable<State[]> EnumerateConfigurations() => CurrentRule.EnumerateConfigurations();
-
-    public override State Get(State[] config) => CurrentRule.Get(config);
-    public override double[] Distribution(State[] config) => CurrentRule.Distribution(config);
-
-    public override double AverageDifference(SingleRule other) => CurrentRule.AverageDifference(other);
-    
-    public override double AverageVariance() => CurrentRule.AverageVariance();
 
 }

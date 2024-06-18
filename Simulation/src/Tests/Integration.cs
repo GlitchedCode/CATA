@@ -1,5 +1,4 @@
 namespace Test;
-using System.Collections.Generic;
 
 public class IntegrationTest
 {
@@ -11,7 +10,7 @@ public class IntegrationTest
     public void TestBoolDistribution(double trueProbability, uint samples, double eps)
     {
         var rng = new Random();
-        var rule = new SingleRule(2);
+        var rule = new TableRule(2);
         rule.Neighborhood = new VonNeumann(1);
 
         var config = Enumerable.Range(1, 5).Select(_ => new State(1, 0)).ToArray();

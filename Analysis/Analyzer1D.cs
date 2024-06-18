@@ -13,14 +13,14 @@ public class Analyzer1D
         public uint LookBackAmount = 1;
     }
 
-    public static SingleRule SingleRule(Simulation.Container.Array<State>.View[] dynamics, Params paramsObj)
+    public static TableRule SingleRule(Simulation.Container.Array<State>.View[] dynamics, Params paramsObj)
     {
         if (dynamics.Length < paramsObj.LookBackAmount + 4)
             throw new Exception("too few simulation states");
 
         var cellCount = dynamics[0].CellCount;
 
-        SingleRule ret = null;
+        TableRule ret = null;
 
         for (uint radius = paramsObj.StartingRadius; radius <= paramsObj.MaxRadius; radius++)
         {
@@ -50,9 +50,9 @@ public class Analyzer1D
         return ret;
     }
 
-    public static SingleRule[] TimeSeries(Simulation.Container.Array<State>.View[] dynamics, Params paramsObj)
+    public static TableRule[] TimeSeries(Simulation.Container.Array<State>.View[] dynamics, Params paramsObj)
     {
-        var ret = new SingleRule[dynamics.Length - 1 - paramsObj.LookBackAmount];
+        var ret = new TableRule[dynamics.Length - 1 - paramsObj.LookBackAmount];
 
         for (int i = 0; i < dynamics.Length - paramsObj.LookBackAmount - 4; ++i)
         {
