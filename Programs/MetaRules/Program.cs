@@ -3,8 +3,6 @@ using Simulation;
 using Plotly.NET.CSharp;
 using Plotly.NET.ImageExport;
 
-using StateView = Simulation.Container.Array<Simulation.State>.View;
-
 public class MetaRulesProgram
 {
   static int Main(string[] args)
@@ -28,7 +26,7 @@ public class MetaRulesProgram
 
     var mat = new List<float[]>();
     foreach (var s in states)
-      mat.Add(s.Select((state) => (float)state.Value / ((float)rule.StatesCount-1)).ToArray());
+      mat.Add(s.Select((state) => (float)state.Value / ((float)rule.CurrentRule.StatesCount-1)).ToArray());
 
     Chart.Heatmap<float, int, int, string>(
       zData: mat.ToArray()

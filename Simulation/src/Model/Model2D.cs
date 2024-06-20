@@ -48,8 +48,9 @@ public class Model2D
             for (int c = 0; c < currentState.Columns; ++c)
             {
                 // von neumann
-                State[] configuration = Neighborhood.Get(stateHistory.ToArray(), r, c);
-                currentState.Set(r, c, Rule.Get(configuration));
+                var rule = Rule.GetCurrentRule(r + c);
+                State[] configuration = (rule.Neighborhood as Neighborhood2D).Get(stateHistory.ToArray(), r, c);
+                currentState.Set(r, c, rule.Get(configuration));
             }
     }
 
@@ -59,7 +60,8 @@ public class Model2D
 
         for (int r = 0; r < currentState.Rows; ++r)
             for (int c = 0; c < currentState.Columns; ++c)
-                currentState.Set(r, c, new State(Rule.BitsCount, rng.Next(Rule.StatesCount)));
+                currentState.Set(r, c, 
+                    new State(Rule.CurrentRule.BitsCount, rng.Next(Rule.CurrentRule.StatesCount)));
     }
 
     public void Set(int row, int column, State state)
@@ -67,7 +69,7 @@ public class Model2D
 
     public void ResetState(Container.Grid2D<State>.View state = null)
     {
-        var nullState = (int r, int c) => new State(Rule.BitsCount, 0);
+        var nullState = (int r, int c) => new State(Rule.CurrentRule.BitsCount, 0);
         var okState = (int r, int c) => state.Get(r, c);
         var getState = state == null ? nullState : okState;
 

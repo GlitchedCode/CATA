@@ -2,10 +2,8 @@ namespace Simulation.Container;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
-using Xunit.Sdk;
 
-public class Grid2D<T> : Array<T>
+public class Grid2D<T> : Simulation.Container.Array<T>
 {
     public int Rows { get; private set; }
     public int Columns { get; private set; }

@@ -6,7 +6,7 @@ public class Model1DToRule : Rule {
   
   public Model1DToRule(Model1D simulation, Neighborhood neighborhood) {
     this.simulation = simulation;
-    this.StatesCount = simulation.Rule.StatesCount;
+    this.StatesCount = simulation.Rule.CurrentRule.StatesCount;
   }
 
   int GetIndex(State[] cfg)
@@ -24,9 +24,9 @@ public class Model1DToRule : Rule {
 
   public override void SetNeighborhood(Neighborhood v) => _neighborhood = v;
   public override Neighborhood GetNeighborhood() => _neighborhood;
-  public override int GetStatesCount() => simulation.Rule.StatesCount;
-  public override int GetBitsCount() => simulation.Rule.BitsCount;
-  public override int GetDefaultState() => simulation.Rule.DefaultState;
+  public override int GetStatesCount() => simulation.Rule.CurrentRule.StatesCount;
+  public override int GetBitsCount() => simulation.Rule.CurrentRule.BitsCount;
+  public override int GetDefaultState() => simulation.Rule.CurrentRule.DefaultState;
 
   public override double[] Distribution(State[] configuration) => throw new NotImplementedException();
   public override IEnumerable<State[]> EnumerateConfigurations() => throw new NotImplementedException();

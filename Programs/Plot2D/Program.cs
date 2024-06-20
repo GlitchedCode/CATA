@@ -14,6 +14,7 @@ class Plot2DProgram
   {
     // var tmpDir = Path.GetTempPath() + "/cata/";
     var tmpDir = "./cata/";
+    try { Directory.Delete(tmpDir, true); } catch { }
     Directory.CreateDirectory(tmpDir);
 
     var simulation = new Model2D(100, 100);
@@ -21,26 +22,27 @@ class Plot2DProgram
     var neighborhood = new VonNeumann(1);
     var lifeRule = new TotalisticRule(2, neighborhood, true);
     var two = new State[] { 
-      new State(1), 
-      new State(0),
-      new State(1), // 2
-      new State(0), 
-      new State(0),
-      new State(0),
-      new State(0),
-      new State(0),
-      new State(0),
+      new State(1, 1), 
+      new State(1, 0),
+      new State(1, 1), // 2
+      new State(1, 0), 
+      new State(1, 0),
+      new State(1, 0),
+      new State(1, 0),
+      new State(1, 0),
+      new State(1, 0),
+
     };
     var three = new State[] { 
-      new State(0), 
-      new State(0),
-      new State(0),
-      new State(1), // 3
-      new State(0),
-      new State(0),
-      new State(0),
-      new State(0),
-      new State(0),
+      new State(1, 0), 
+      new State(1, 0),
+      new State(1, 0),
+      new State(1, 1), // 3
+      new State(1, 0),
+      new State(1, 0),
+      new State(1, 0),
+      new State(1, 0),
+      new State(1, 0),
     };
 
     // B3
@@ -58,7 +60,7 @@ class Plot2DProgram
       simulation.Advance();
       var stateMat = simulation.GetCurrentStateView().ToMatrix();
       var floatMat = stateMat.Select(r => r.Select(s => (float)s.Value));
-      Chart.Heatmap<float,int,int,string>(zData:floatMat).SavePNG("test.png");
+      Chart.Heatmap<float,int,int,string>(zData:floatMat).SavePNG(tmpDir + i);
     }
 
     simulation.Randomize();

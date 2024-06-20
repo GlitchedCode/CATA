@@ -8,7 +8,7 @@ public class TotalisticRule : Rule
   int _DefaultState;
   Neighborhood _Neighborhood;
   Random rng = new();
-  StateCounter[] counters;
+  Dictionary<int, StateCounter> counters = new();
 
   public bool Outer { get; private set; }
 
@@ -31,12 +31,6 @@ public class TotalisticRule : Rule
     _DefaultState = 0;
     Outer = outer;
     _Neighborhood = neighborhood;
-
-    // conta quanti contatori ti servono
-    var count = Outer ? statesCount * statesCount * (neighborhood.Count() - 1) : statesCount * neighborhood.Count();
-    counters = new StateCounter[count];
-    for(int i = 0; i < count; i++)
-      counters[i] = new StateCounter(statesCount, rng);
   }
   
   int idx(State[] configuration) {
@@ -51,6 +45,7 @@ public class TotalisticRule : Rule
   public void Set(State[] configuration, double[] distribution) {
     if(distribution.Length != _StatesCount) throw new ArgumentException("Invalid distribution length, should equal state count");
     var i = idx(configuration);
+    if(!counters.ContainsKey(i)) counters[i] = new StateCounter(_StatesCount);
     counters[i].Reset();
     for(int j = 0; j < _StatesCount; j++)
       counters[i].Increment(j, (uint)(distribution[j] * 1000));
@@ -58,12 +53,21 @@ public class TotalisticRule : Rule
 
   public void Increment(State[] configuration, int state) {
     var i = idx(configuration);
+    if(!counters.ContainsKey(i)) counters[i] = new StateCounter(_StatesCount);
     counters[i].Increment(state);
   }
 
   public override State Get(State[] configuration)
-    => new State(BitsCount, counters[idx(configuration)].Get());
+  {
+    var i = idx(configuration);
+    if(!counters.ContainsKey(i)) return new State(BitsCount, DefaultState); 
+    return new State(BitsCount, counters[i].Get());
+  }
 
   public override double[] Distribution(State[] configuration)
-    => counters[idx(configuration)].Distribution();
+  {
+    var i = idx(configuration);
+    if(!counters.ContainsKey(i)) return Enumerable.Repeat(0.0, _StatesCount).ToArray();
+    return counters[i].Distribution();
+  } 
 }
