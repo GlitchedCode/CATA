@@ -19,11 +19,11 @@ class Plot2DProgram
 
     var simulation = new Model2D(100, 100);
   
-    var neighborhood = new VonNeumann(1);
+    var neighborhood = new Moore(1);
     var lifeRule = new TotalisticRule(2, neighborhood, true);
     var two = new State[] { 
       new State(1, 1), 
-      new State(1, 0),
+      new State(1, 1),
       new State(1, 1), // 2
       new State(1, 0), 
       new State(1, 0),
@@ -35,8 +35,8 @@ class Plot2DProgram
     };
     var three = new State[] { 
       new State(1, 0), 
-      new State(1, 0),
-      new State(1, 0),
+      new State(1, 1),
+      new State(1, 1),
       new State(1, 1), // 3
       new State(1, 0),
       new State(1, 0),
@@ -57,7 +57,9 @@ class Plot2DProgram
 
     for (int i = 0; i < 100; i++)
     {
+      Console.WriteLine("Step " + i);
       simulation.Advance();
+      Console.WriteLine("Step " + i + " done");
       var stateMat = simulation.GetCurrentStateView().ToMatrix();
       var floatMat = stateMat.Select(r => r.Select(s => (float)s.Value));
       Chart.Heatmap<float,int,int,string>(zData:floatMat).SavePNG(tmpDir + i);
