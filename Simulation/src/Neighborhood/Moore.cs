@@ -4,7 +4,7 @@ public class Moore : Neighborhood2D
 {
   public uint Radius = 1;
 
-  public Moore(uint radius = 1, uint lookBack = 1, int rows = 1, int cols = 1)
+  public Moore(uint radius = 1, uint lookBack = 0, int rows = 1, int cols = 1)
   {
     this.Rows = rows;
     this.Columns = cols;

@@ -5,6 +5,7 @@ public class Model1DToRule : Rule {
   Neighborhood _neighborhood;
   
   public Model1DToRule(Model1D simulation, Neighborhood neighborhood) {
+    this._neighborhood = neighborhood;
     this.simulation = simulation;
     this.StatesCount = simulation.Rule.CurrentRule.StatesCount;
   }
@@ -30,9 +31,9 @@ public class Model1DToRule : Rule {
 
   public override double[] Distribution(State[] configuration) => throw new NotImplementedException();
   public override IEnumerable<State[]> EnumerateConfigurations() => throw new NotImplementedException();
-  public override void SetBitsCount(int v) => throw new NotImplementedException();
-  public override void SetDefaultState(int v) => throw new NotImplementedException();
-  public override void SetStatesCount(int v) => throw new NotImplementedException();
+  public override void SetBitsCount(int v) {}
+  public override void SetDefaultState(int v) {}
+  public override void SetStatesCount(int v) {}
 }
 
 public class Model1DRule : MetaRule
@@ -51,7 +52,7 @@ public class Model1DRule : MetaRule
     simRule = new(simulation, neighborhood);
   }
 
-  public void SetNeighborhood(Neighborhood v) => simRule.Neighborhood = v;
+  public void SetInnerNeighborhood(Neighborhood v) => simRule.Neighborhood = v;
   public override void Advance() => simulation.Advance();
   public void Randomize() => simulation.Randomize();
   public override Rule GetCurrentRule(int position) => simRule;

@@ -20,6 +20,7 @@ class Plot2DProgram
     var simulation = new Model2D(100, 100);
   
     var neighborhood = new Moore(1);
+    Console.WriteLine(neighborhood.Count());
     var lifeRule = new TotalisticRule(2, neighborhood, true);
     var two = new State[] { 
       new State(1, 1), 

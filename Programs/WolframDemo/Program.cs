@@ -50,7 +50,7 @@ class WolframDemoProgram {
         YGap: 10
         )
       .WithLayout(layout)
-      .SavePNG("test");
+      .SavePNG("test", Width: 1600, Height: 1600);
 
   }
 }
