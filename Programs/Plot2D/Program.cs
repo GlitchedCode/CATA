@@ -17,7 +17,8 @@ class Plot2DProgram
     try { Directory.Delete(tmpDir, true); } catch { }
     Directory.CreateDirectory(tmpDir);
 
-    var simulation = new Model2D(100, 100);
+    var space = new Simulation.Container.Grid2D<State>(100, 100, new State(1, 0));
+    var simulation = new Model1D<Simulation.Container.Grid2D<State>>(space);
   
     var neighborhood = new Moore(1);
     Console.WriteLine(neighborhood.Count());
@@ -56,12 +57,17 @@ class Plot2DProgram
     simulation.Rule = lifeRule;
     simulation.Randomize();
 
-    for (int i = 0; i < 100; i++)
+    {
+      var stateMat = simulation.CurrentState.ToMatrix();
+      var floatMat = stateMat.Select(r => r.Select(s => (float)s.Value));
+      Chart.Heatmap<float,int,int,string>(zData:floatMat).SavePNG(tmpDir + "0");
+    }
+    for (int i = 1; i <= 100; i++)
     {
       Console.WriteLine("Step " + i);
       simulation.Advance();
       Console.WriteLine("Step " + i + " done");
-      var stateMat = simulation.GetCurrentStateView().ToMatrix();
+      var stateMat = simulation.CurrentState.ToMatrix();
       var floatMat = stateMat.Select(r => r.Select(s => (float)s.Value));
       Chart.Heatmap<float,int,int,string>(zData:floatMat).SavePNG(tmpDir + i);
     }

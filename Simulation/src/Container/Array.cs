@@ -20,7 +20,6 @@ public class Array<T> : ICloneable
     this.DefaultValue = sparseDefault;
 
     map = new(4, cellCount);
-    _view = new View(this);
 
     Resize(cellCount);
   }
@@ -30,7 +29,6 @@ public class Array<T> : ICloneable
     map = other.map;
     DefaultValue = other.DefaultValue;
     CellCount = other.CellCount;
-    _view = new View(this);
   }
 
   public void Resize(int cellCount)
@@ -69,9 +67,10 @@ public class Array<T> : ICloneable
 
   public virtual void Clear() => map.Clear();
 
-  private View _view;
-  public View GetView() => _view;
 
+  public virtual Array<T> MakeNew() {
+    return new Array<T>(CellCount, DefaultValue);
+  } 
 
   public object Clone()
   {
@@ -91,27 +90,6 @@ public class Array<T> : ICloneable
     return vals.ToArray();
   }
 
-  public class View
-  {
-    Array<T> container;
-
-    public int CellCount => container.CellCount;
-    public T DefaultValue => container.DefaultValue;
-
-    public View(Array<T> cont) => container = cont;
-
-    public T Get(int index) => container.Get(index);
-    public T[] ToArray() => container.ToArray();
-
-    public void Print(string charmap = null)
-    {
-      if(charmap != null)
-        container.Print(charmap);
-      else
-        container.Print();
-    }
-  }
-
   public void Print()
   {
     string line = "";
@@ -129,13 +107,13 @@ public class Array<T> : ICloneable
     Console.WriteLine(line);
   }
 
-  public static void PrintMany(IEnumerable<Array<T>.View> states)
+  public static void PrintMany(IEnumerable<Array<T>> states)
   {
     foreach (var state in states)
       state.Print();
   }
 
-  public static void PrintMany(IEnumerable<Array<State>.View> states, string charmap)
+  public static void PrintMany(IEnumerable<Array<State>> states, string charmap)
   {
     foreach (var state in states)
       state.Print(charmap);

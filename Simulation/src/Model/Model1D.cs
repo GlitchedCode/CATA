@@ -3,13 +3,13 @@ namespace Simulation;
 using System;
 using System.Collections.Generic;
 
-public class Model1D
+public class Model1D<Space> where Space : Container.Array<State>
 {
     public MetaRule Rule;
 
     int maxStateHistory;
-    List<Container.Array<State>.View> stateHistory = new();
-    Container.Array<State> currentState;
+    List<Container.Array<State>> stateHistory = new();
+    public Space CurrentState {get; protected set;}
 
     public State DefaultState = new State(1, 0);
 
@@ -19,34 +19,36 @@ public class Model1D
       set => _updateMask = value == null ? new() : value;
     }
 
-    public Model1D(int cellCount, int maxStateHistory = 1)
+    public Model1D(Space space, int maxStateHistory = 1)
     {
         if (maxStateHistory < 1)
             this.maxStateHistory = 1;
         else
             this.maxStateHistory = maxStateHistory;
-
+        
         Rule = new TableRule(2);
-        currentState = new(cellCount, DefaultState);
-        ResetState(currentState.GetView());
+        CurrentState = space;
+        ResetState(CurrentState);
     }
 
     public void Advance()
     {
-        stateHistory.Insert(0, currentState.GetView());
+        stateHistory.Insert(0, CurrentState);
         var diff = stateHistory.Count - maxStateHistory;
         if (diff > 0)
             stateHistory.RemoveRange(maxStateHistory, diff);
 
-        currentState = new(stateHistory[0].CellCount, DefaultState);
-        for (int i = 0; i < currentState.CellCount; ++i)
+        CurrentState = CurrentState.MakeNew() as Space;
+        for (int i = 0; i < CurrentState.CellCount; ++i)
         {
             if(!UpdateMask.Get(i)) continue;
             var rule = Rule.GetCurrentRule(i);
             var configuration = rule.Neighborhood.Get(stateHistory.ToArray(), i);
-            currentState.Set(i, rule.Get(configuration));
+            CurrentState.Set(i, rule.Get(configuration));
+            rule.Advance();
         }
-
+        
+        Rule.Advance();
         UpdateMask.Advance();
     }
 
@@ -54,24 +56,24 @@ public class Model1D
     {
         Random rng = new Random();
 
-        for (int i = 0; i < currentState.CellCount; ++i)
-            currentState.Set(i, new State(Rule.CurrentRule.BitsCount, rng.Next(Rule.CurrentRule.StatesCount)));
+        for (int i = 0; i < CurrentState.CellCount; ++i)
+            CurrentState.Set(i, new State(Rule.CurrentRule.BitsCount, rng.Next(Rule.CurrentRule.StatesCount)));
     }
 
     public void Set(int index, State state)
-        => this.currentState.Set(index, state);
+        => this.CurrentState.Set(index, state);
 
-    public void ResetState(Container.Array<State>.View state = null)
+    public void ResetState(Container.Array<State> state = null)
     {
         var nullState = (int i) => new State(Rule.CurrentRule.BitsCount, 0);
         var okState = (int i) => state.Get(i);
         var getState = state == null ? nullState : okState;
 
-        for (int i = 0; i < currentState.CellCount; ++i)
+        for (int i = 0; i < CurrentState.CellCount; ++i)
             Set(i, getState(i));
     }
 
-    public void ResetHistory(IEnumerable<Container.Array<State>.View> states)
+    public void ResetHistory(IEnumerable<Container.Array<State>> states)
     {
         stateHistory = new(states.Take(states.Count() - 1));
         ResetState(states.Last());
@@ -79,9 +81,7 @@ public class Model1D
 
     public void Resize(int cellCount)
     {
-        currentState.Resize(cellCount);
-        ResetState(currentState.GetView());
+        CurrentState.Resize(cellCount);
+        ResetState(CurrentState);
     }
-
-    public Container.Array<State>.View GetCurrentStateView() => currentState.GetView();
 }

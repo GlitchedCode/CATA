@@ -26,11 +26,11 @@ namespace Simulation
             return ret * (LookBack + 1);
         }
 
-        public override State[] Get(Container.Array<State>.View[] states, int index)
+        public override State[] Get(Container.Array<State>[] states, int index)
         {
             var count = Count();
             State[] configuration = new State[count];
-            var segment = new ArraySegment<Container.Array<State>.View>
+            var segment = new ArraySegment<Container.Array<State>>
                 (states, 0, Math.Min((int)LookBack + 1, states.Length));
 
             int idx = 0;

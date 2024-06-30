@@ -1,10 +1,10 @@
 namespace Simulation;
 
 public class Model1DToRule : Rule {
-  Model1D simulation;
+  Model1D<Container.Array<State>> simulation;
   Neighborhood _neighborhood;
   
-  public Model1DToRule(Model1D simulation, Neighborhood neighborhood) {
+  public Model1DToRule(Model1D<Container.Array<State>> simulation, Neighborhood neighborhood) {
     this._neighborhood = neighborhood;
     this.simulation = simulation;
     this.StatesCount = simulation.Rule.CurrentRule.StatesCount;
@@ -20,7 +20,7 @@ public class Model1DToRule : Rule {
   }  
   
   public override State Get(State[] configuration) {
-    return simulation.GetCurrentStateView().Get(GetIndex(configuration));
+    return simulation.CurrentState.Get(GetIndex(configuration));
   }
 
   public override void SetNeighborhood(Neighborhood v) => _neighborhood = v;
@@ -39,7 +39,7 @@ public class Model1DToRule : Rule {
 public class Model1DRule : MetaRule
 {
   int defaultState;
-  Model1D simulation;
+  Model1D<Container.Array<State>> simulation;
   Model1DToRule simRule;
 
   public Model1DRule(Rule rule, Neighborhood neighborhood)
@@ -47,7 +47,7 @@ public class Model1DRule : MetaRule
     var cellCount = Enumerable
       .Repeat(rule.StatesCount, (int)neighborhood.Count())
       .Aggregate(1, (a, b) => a * b);
-    simulation = new Model1D(cellCount, 10);
+    simulation = new Model1D<Container.Array<State>>(new(cellCount, new State(1, 0)), 10);
     simulation.Rule = rule;
     simRule = new(simulation, neighborhood);
   }

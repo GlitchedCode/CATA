@@ -14,9 +14,9 @@ public class Radius1D : Neighborhood
     public override uint Count()
         => (1 + (Radius * 2)) * (LookBack + 1);
 
-    public override State[] Get(Container.Array<State>.View[] states, int index)
+    public override State[] Get(Container.Array<State>[] states, int index)
     {
-        var segment = new ArraySegment<Container.Array<State>.View>
+        var segment = new ArraySegment<Container.Array<State>>
             (states, 0, Math.Min((int)LookBack + 1, states.Length));
 
         var defaultValue = states[0].DefaultValue;

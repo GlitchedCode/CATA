@@ -19,49 +19,10 @@ public class Moore : Neighborhood2D
       return ret * (LookBack + 1);
     }
 
-    public override State[] Get(Container.Array<State>.View[] states, int index)
+    public override State[] Get(Container.Array<State>[] states, int index)
     {
-      var count = Count();
-      State[] configuration = new State[count];
-      var segment = new ArraySegment<Container.Array<State>.View>
-        (states, 0, Math.Min((int)LookBack + 1, states.Length));
-
-      int idx = 0;
-      
-      int row = GetRowFromKey(index);
-      int column = GetColumnFromKey(index);
-     
-      foreach (var state in segment)
-      {
-        configuration[idx] = state.Get(index);
-        idx++;
-
-        for (int i = 1; i <= Radius; i++)
-        {
-          // top and bottom
-          for (int j = -(i-1); j < i; j++)
-          {
-            configuration[idx] = state.Get(GetKeyFromCoords(row + i, column + j));
-            idx++;
-
-            configuration[idx] = state.Get(GetKeyFromCoords(row - i, column + j));
-            idx++;
-          }
-
-          // left and right
-          for (int j = -(i-2); j < i+1; j++)
-          {
-            configuration[idx] = state.Get(GetKeyFromCoords(row + j, column + i));
-            idx++;
-
-            configuration[idx] = state.Get(GetKeyFromCoords(row + j, column - i));
-            idx++;
-          }
-
-        }
-      }
-
-      return configuration;
+      var grids = states.Select(state => new Container.Grid2D<State>(Rows, Columns, state));
+      return Get(grids.ToArray(), GetRowFromKey(index), GetColumnFromKey(index));
     }
 
     public override State[] Get(Container.Grid2D<State>[] states, int row, int column)

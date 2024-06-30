@@ -76,8 +76,6 @@ public class Grid2D<T> : Simulation.Container.Array<T>
     public void Remove(int row, int col) =>
         base.Remove(GetKeyFromCoords(row, col));
 
-    public new View GetView() => new View(this);
-
     private int GetRowFromKey(int key) =>
         key / Columns;
 
@@ -87,39 +85,19 @@ public class Grid2D<T> : Simulation.Container.Array<T>
     private int GetKeyFromCoords(int row, int col) =>
         (row * Columns) + col;
 
+    public override Array<T> MakeNew() =>
+        new Grid2D<T>(Rows, Columns, DefaultValue);
 
-    public new class View
-    {
-        Grid2D<T> container;
-
-        public int Rows => container.Rows;
-        public int Columns => container.Columns;
-
-        public View(Grid2D<T> cont) => container = cont;
-
-        public T Get(int row, int col) =>
-            container.Get(row, col);
-
-
-        private int GetRowFromKey(int key) =>
-        key / Columns;
-
-        private int GetColumnFromKey(int key) =>
-            key % Columns;
-
-        private int GetKeyFromCoords(int row, int col) =>
-            (row * Columns) + col;
-
-        public T[][] ToMatrix() {
-          var ret = new List<T[]>();
-          for(int r = 0; r < Rows; r++)
-          {
-            var row = new List<T>();
-            for(int c = 0; c < Columns; c++)
-              row.Add(Get(r,c));
-            ret.Add(row.ToArray());
-          }
-          return ret.ToArray();
-        }
+    public T[][] ToMatrix() {
+      var ret = new List<T[]>();
+      for(int r = 0; r < Rows; r++)
+      {
+        var row = new List<T>();
+        for(int c = 0; c < Columns; c++)
+          row.Add(Get(r,c));
+        ret.Add(row.ToArray());
+      }
+      return ret.ToArray();
     }
+
 }

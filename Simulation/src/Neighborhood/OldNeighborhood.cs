@@ -8,8 +8,8 @@ public abstract class OldNeighborhood
     public abstract uint Count2D();
     public abstract uint Count1D();
 
-    public abstract State[] Get2D(Container.Grid2D<State>.View state, int row, int column);
-    public abstract State[] Get1D(Container.Array<State>.View state, int index);
+    public abstract State[] Get2D(Container.Grid2D<State> jstate, int row, int column);
+    public abstract State[] Get1D(Container.Array<State> state, int index);
 
     public abstract ConfigurationKey ConvertKey(ConfigurationKey input, State defaultState);
 
