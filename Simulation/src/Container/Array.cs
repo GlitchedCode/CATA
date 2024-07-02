@@ -26,9 +26,11 @@ public class Array<T> : ICloneable
 
   public Array(Array<T> other)
   {
-    map = other.map;
     DefaultValue = other.DefaultValue;
     CellCount = other.CellCount;
+    
+    map = other.map;
+    Resize(CellCount);
   }
 
   public void Resize(int cellCount)

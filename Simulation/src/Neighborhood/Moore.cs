@@ -52,7 +52,7 @@ public class Moore : Neighborhood2D
           }
 
           // left and right
-          for (int j = -(i-2); j < i+1; j++)
+          for (int j = -i; j < i+1; j++)
           {
             configuration[idx] = state.Get(row + j, column + i);
             idx++;
