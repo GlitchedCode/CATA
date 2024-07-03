@@ -21,6 +21,8 @@ class Plot2DProgram
     var simulation = new Model1D<Simulation.Container.Grid2D<State>>(space);
   
     var neighborhood = new Moore(1);
+    neighborhood.Rows = 100;
+    neighborhood.Columns = 100;
     Console.WriteLine(neighborhood.Count());
     var lifeRule = new TotalisticRule(2, neighborhood, true);
     var two = new State[] { 
