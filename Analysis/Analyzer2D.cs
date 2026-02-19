@@ -3,18 +3,18 @@ using Simulation;
 
 public class Analyzer2D
 {
-    public static bool Validate(TableRule rule, Simulation.Container.Grid2D<State>.View[] dynamics)
+    public static bool Validate(TableRule rule, Simulation.Container.Grid2D<State>[] dynamics)
     {
         return false;
     }
 
-    public static TableRule SingleRule(Simulation.Container.Grid2D<State>.View[] dynamics, int statesCount)
+    public static TableRule SingleRule(Simulation.Container.Grid2D<State>[] dynamics, int statesCount)
     {
         // TODO fanculo ci si deve rifare ad analyzer1d
         return null;
     }
 
-    public static TableRule[] TimeSeries(Simulation.Container.Grid2D<State>.View[] dynamics, int statesCount)
+    public static TableRule[] TimeSeries(Simulation.Container.Grid2D<State>[] dynamics, int statesCount)
     {
         // TODO fanculo ci si deve rifare ad analyzer1d
         return null;

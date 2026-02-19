@@ -5,7 +5,7 @@ public partial class Demo1D : Control
 {
     Simulation1DView originalView, recreatedView;
 
-    Model1D originalSimulation, recreatedSimulation;
+    Model originalSimulation, recreatedSimulation;
     List<Simulation.Container.Array<State>.View> states;
 
     Label diffLabel;

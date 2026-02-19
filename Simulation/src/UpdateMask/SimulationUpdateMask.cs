@@ -2,9 +2,9 @@ namespace Simulation;
 
 public class SimulationUpdateMask : UpdateMask {
 
-  public Model1D<Container.Array<State>> ReferenceModel {get; protected set;}
+  public Model<Container.Array<State>> ReferenceModel {get; protected set;}
 
-  public SimulationUpdateMask(Model1D<Container.Array<State>> reference)
+  public SimulationUpdateMask(Model<Container.Array<State>> reference)
   {
     if(reference == null)
       throw new NullReferenceException("reference model cannot be null");

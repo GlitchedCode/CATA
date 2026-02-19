@@ -3,7 +3,7 @@ namespace Simulation;
 using System;
 using System.Collections.Generic;
 
-public class Model1D<Space> where Space : Container.Array<State>
+public class Model<Space> where Space : Container.Array<State>
 {
     public MetaRule Rule;
 
@@ -19,7 +19,7 @@ public class Model1D<Space> where Space : Container.Array<State>
       set => _updateMask = value == null ? new() : value;
     }
 
-    public Model1D(Space space, int maxStateHistory = 1)
+    public Model(Space space, int maxStateHistory = 1)
     {
         if (maxStateHistory < 1)
             this.maxStateHistory = 1;

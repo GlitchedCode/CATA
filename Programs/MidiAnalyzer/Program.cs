@@ -10,7 +10,7 @@ using SimState = Simulation.Container.Array<Simulation.State>;
 
 class MidiAnalyzerProgram
 {
-    static void ReplaceMidiEvents(MidiFile file, int track, int channel, int dtMul, List<SimState.View> states)
+    static void ReplaceMidiEvents(MidiFile file, int track, int channel, int dtMul, List<SimState> states)
     {
         int getNoteLength(int idx, int offset)
         {
@@ -31,7 +31,7 @@ class MidiAnalyzerProgram
 
         var noteManager = trackChunk.ManageNotes();
         noteManager.Objects.RemoveAll(n => n.Channel == channel);
-        var previous = new SimState(128, new State(2)).GetView();
+        var previous = new SimState(128, new State(2));
         for(int offset = 0; offset < states.Count; offset++)
         {
             var state = states[offset];
@@ -101,15 +101,16 @@ class MidiAnalyzerProgram
         var simStates = MidiFileToSimStates(midiFile, 3, 4, 2);
 
         Console.WriteLine("original");
-        SimState.PrintMany(simStates.Select(s => s.GetView()), ".O");
+        SimState.PrintMany(simStates, ".O");
 
-        var analyzerParams = new Analyzer1D.Params();
-        var model = new Model1D(128, 80);
-        var simView = new List<SimState.View>();
-        foreach (var s in simStates) simView.Add(s.GetView());
+        var analyzerParams = new Analysis.Analyzer1D.Params();
+        var space = new SimState(128, new State(2));
+        var model = new Model<SimState>(space, 80);
+        var simView = new List<SimState>();
+        foreach (var s in simStates) simView.Add(s);
 
         Console.WriteLine("Analyzing...");
-        var series = Analyzer1D.TimeSeries(simView.ToArray(), analyzerParams);
+        var series = Analysis.Analyzer1D.TimeSeries(simView.ToArray(), analyzerParams);
         var rule = new CyclicRule(series);
         // var rule = Analyzer1D.SingleRule(simView.ToArray(), analyzerParams);
 
@@ -120,19 +121,19 @@ class MidiAnalyzerProgram
             for (int i = 0; i < s.CellCount; i++) ret |= s.Get(i).Value != 0;
             return ret;
         });
-        model.ResetState(state.GetView());
+        model.ResetState(state);
 
         //model.ResetHistory(simStates.Take(20).Select(s => s.GetView()));
         //model.Randomize();
         simView.Clear();
-        simView.Add(model.GetCurrentStateView());
+        simView.Add(model.CurrentState);
 
         model.Rule = rule;
         for (int i = 0; i < 200; i++)
         {
             model.Advance();
             rule.Advance();
-            simView.Add(model.GetCurrentStateView());
+            simView.Add(model.CurrentState);
         }
 
 

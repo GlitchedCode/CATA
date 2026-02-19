@@ -6,7 +6,7 @@ public class OuterTotalisticTest : CATest {
   
   public Neighborhood neighborhood; 
 
-  public  bool Test(Simulation.Container.Array<State>.View[] dynamics)
+  public  bool Test(Simulation.Container.Array<State>[] dynamics)
   {
     var cellCount = dynamics[0].CellCount;
     var encountered = new Dictionary<(int, int), int>();

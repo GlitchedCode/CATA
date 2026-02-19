@@ -9,7 +9,8 @@ public class MetaRulesProgram
 {
   static int Main(string[] args)
   {
-    var simulation = new Model1D(200, 10);
+    var space = new Simulation.Container.Array<State>(100, new State(1, 0));
+    var simulation = new Model<Simulation.Container.Array<State>>(space, 10);
 
     var higherOrderRule = new WolframRule(89);
     var rule = new Model1DRule(higherOrderRule, new Radius1D(2));
@@ -19,12 +20,12 @@ public class MetaRulesProgram
     simulation.Randomize();
 
     var states = new List<Simulation.State[]>();
-    states.Add(simulation.GetCurrentStateView().ToArray());
+    states.Add(simulation.CurrentState.ToArray());
     for(int i = 0; i < 200; i++)
     {
       simulation.Advance();
       rule.Advance();
-      states.Add(simulation.GetCurrentStateView().ToArray());
+      states.Add(simulation.CurrentState.ToArray());
     }
 
     var mat = new List<float[]>();

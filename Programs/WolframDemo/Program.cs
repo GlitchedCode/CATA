@@ -7,17 +7,18 @@ using Plotly.NET.CSharp;
 class WolframDemoProgram {
 
   static void Main(string[] args) {
-    var simulation = new Model1D(300);
+    var space = new Simulation.Container.Array<State>(300, new State(1, 0));
+    var simulation = new Model<Simulation.Container.Array<State>>(space);
     var rule = new WolframRule(30);
     simulation.Rule = rule;
     simulation.Randomize();
     
     var states = new List<Simulation.State[]>();
-    states.Add(simulation.GetCurrentStateView().ToArray());
+    states.Add(simulation.CurrentState.ToArray());
     for (int i = 0; i < 300; i++) {
       Console.WriteLine(i);
       simulation.Advance();
-      states.Add(simulation.GetCurrentStateView().ToArray());
+      states.Add(simulation.CurrentState.ToArray());
     }
 
     var mat = new List<float[]>();

@@ -18,7 +18,7 @@ class Plot2DProgram
     Directory.CreateDirectory(tmpDir);
 
     var space = new Simulation.Container.Grid2D<State>(100, 100, new State(1, 0));
-    var simulation = new Model1D<Simulation.Container.Grid2D<State>>(space);
+    var simulation = new Model<Simulation.Container.Grid2D<State>>(space);
   
     var neighborhood = new Moore(1);
     neighborhood.Rows = 100;

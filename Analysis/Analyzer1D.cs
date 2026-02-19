@@ -13,7 +13,7 @@ public class Analyzer1D
         public uint LookBackAmount = 1;
     }
 
-    public static TableRule SingleRule(Simulation.Container.Array<State>.View[] dynamics, Params paramsObj)
+    public static TableRule SingleRule(Simulation.Container.Array<State>[] dynamics, Params paramsObj)
     {
         if (dynamics.Length < paramsObj.LookBackAmount + 4)
             throw new Exception("too few simulation states");
@@ -30,7 +30,7 @@ public class Analyzer1D
 
             for (int i = 0; i < dynamics.Length - paramsObj.LookBackAmount - 1; ++i)
             {
-                var segment = new ArraySegment<Simulation.Container.Array<State>.View>
+                var segment = new ArraySegment<Simulation.Container.Array<State>>
                     (dynamics, i, (int)paramsObj.LookBackAmount + 1);
 
                 var nextIdx = i + paramsObj.LookBackAmount + 1;
@@ -50,13 +50,13 @@ public class Analyzer1D
         return ret;
     }
 
-    public static TableRule[] TimeSeries(Simulation.Container.Array<State>.View[] dynamics, Params paramsObj)
+    public static TableRule[] TimeSeries(Simulation.Container.Array<State>[] dynamics, Params paramsObj)
     {
         var ret = new TableRule[dynamics.Length - 1 - paramsObj.LookBackAmount];
 
         for (int i = 0; i < dynamics.Length - paramsObj.LookBackAmount - 4; ++i)
         {
-            var segment = new ArraySegment<Simulation.Container.Array<State>.View>
+            var segment = new ArraySegment<Simulation.Container.Array<State>>
                 (dynamics, i, (int)paramsObj.LookBackAmount + 4);
             ret[i] = SingleRule(segment.ToArray(), paramsObj);
         }

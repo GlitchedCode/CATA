@@ -4,13 +4,13 @@ using Simulation;
 class CompressedBuffer
 {
     readonly CompressionRule rule;
-    readonly Array<State>.View[] startingBuffer;
+    readonly Array<State>[] startingBuffer;
     readonly State sparseDefault = new State(1, 0);
     readonly int generationLength;
     readonly int lookback;
 
 
-    (int count, TableRule rule) Analyze(List<Array<State>.View> dynamics)
+    (int count, TableRule rule) Analyze(List<Array<State>> dynamics)
     {
         TableRule rule = new(2, 0);
         rule.Neighborhood = new Radius1D(0, (uint)lookback);
@@ -45,11 +45,11 @@ class CompressedBuffer
             throw new Exception("invalid params");
 
         // convert to sim state
-        var dynamics = new List<Array<State>.View>(buffer.Select(b =>
+        var dynamics = new List<Array<State>>(buffer.Select(b =>
         {
             var ret = new Array<State>(1, sparseDefault);
             ret.Set(0, new State(1, b ? 1 : 0));
-            return ret.GetView();
+            return ret;
         }));
 
         startingBuffer = dynamics.Take(lookback + 1).ToArray();
@@ -144,14 +144,16 @@ class CompressedBuffer
     {
         var ret = new List<bool>(startingBuffer.Select(v => v.Get(0).Value == 1));
 
-        var model = new Model1D(1, lookback + 1);
+        var space = new Simulation.Container.Array<State>(1, new State(1, 0));
+        var model = new Model<Simulation.Container.Array<State>>(
+            space, lookback + 1);
         model.Rule = rule;
         model.ResetHistory(startingBuffer);
         for (int i = 0; i < generationLength; i++)
         {
             model.Advance();
             rule.Advance();
-            ret.Add(model.GetCurrentStateView().Get(0).Value == 1);
+            ret.Add(space.Get(0).Value == 1);
         }
 
         return ret.ToArray();
