@@ -23,8 +23,7 @@ public class MetaRulesProgram
     states.Add(simulation.CurrentState.ToArray());
     for(int i = 0; i < 200; i++)
     {
-      simulation.Advance();
-      rule.Advance();
+      simulation.Advance();  // simulation.Advance() already calls rule.Advance() internally
       states.Add(simulation.CurrentState.ToArray());
     }
 

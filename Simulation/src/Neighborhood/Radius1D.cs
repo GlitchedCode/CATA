@@ -3,12 +3,11 @@ namespace Simulation;
 public class Radius1D : Neighborhood
 {
     public uint Radius = 1;
-    public uint LookBack = 0;
 
     public Radius1D(uint radius = 1, uint lookBack = 0)
     {
         Radius = radius;
-        LookBack = lookBack;
+        LookBack = lookBack;  // sets the base class field
     }
 
     public override uint Count()

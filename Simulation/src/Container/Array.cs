@@ -28,8 +28,8 @@ public class Array<T> : ICloneable
   {
     DefaultValue = other.DefaultValue;
     CellCount = other.CellCount;
-    
-    map = other.map;
+
+    map = new ConcurrentDictionary<int, T>(other.map);
     Resize(CellCount);
   }
 

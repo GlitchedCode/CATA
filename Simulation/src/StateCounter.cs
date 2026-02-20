@@ -83,7 +83,7 @@ public class StateCounter
 
         var t1 = 0d;
         for (int i = 1; i < counters.Length; i++)
-            t1 += Math.Pow(i * counters[i], 2);
+            t1 += Math.Pow(i, 2) * counters[i];
 
         t1 /= total;
 

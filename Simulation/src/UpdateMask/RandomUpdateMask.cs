@@ -16,13 +16,14 @@ namespace Simulation
       set => _probability = Math.Max(0, Math.Min(1, value));
     }
 
-    public RandomUpdateMask(float probability, Random rng = null){
-      RNG = rng; 
+    public RandomUpdateMask(double probability, Random rng = null){
+      Probability = probability;
+      RNG = rng;
     }
 
     public override bool Get(int idx)
     {
-      return RNG.NextDouble() > Probability;
+      return RNG.NextDouble() < Probability;
     }
   }
 

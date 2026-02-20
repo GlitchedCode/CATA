@@ -34,9 +34,9 @@ public class TotalisticRule : Rule
   }
   
   int idx(State[] configuration) {
-    var cfg = Outer ? configuration.Skip(1) : configuration; 
+    var cfg = Outer ? configuration.Skip(1) : configuration;
     var idx = 0;
-    foreach(var state in configuration)
+    foreach(var state in cfg)
       idx += state.Value;
 
     return Outer ? idx * (configuration[0].Value + 1) : idx;

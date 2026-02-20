@@ -151,8 +151,7 @@ class CompressedBuffer
         model.ResetHistory(startingBuffer);
         for (int i = 0; i < generationLength; i++)
         {
-            model.Advance();
-            rule.Advance();
+            model.Advance();  // model.Advance() already calls rule.Advance() internally
             ret.Add(space.Get(0).Value == 1);
         }
 

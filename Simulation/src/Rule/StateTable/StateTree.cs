@@ -99,7 +99,7 @@ public class StateTree : StateTable
 
             current = current.children[branch] as Branch;
         }
-        throw new Exception("what the fuck");
+        throw new Exception("Unreachable: configuration length was 0");
     }
 
     public override void Set(State[] configuration, int stateValue)

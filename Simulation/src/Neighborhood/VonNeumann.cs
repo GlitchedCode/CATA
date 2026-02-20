@@ -129,9 +129,13 @@ namespace Simulation
 
                 while (reader.Read())
                 {
+                    if (reader.TokenType == JsonTokenType.EndObject) break;
+
                     if (reader.TokenType == JsonTokenType.PropertyName)
                     {
-                        switch (reader.GetString())
+                        var propName = reader.GetString();
+                        reader.Read(); // advance to value token
+                        switch (propName)
                         {
                             case "Radius":
                                 ret = new VonNeumann(reader.GetUInt32());
@@ -158,15 +162,10 @@ namespace Simulation
                 JsonSerializerOptions options
             )
             {
-                writer.WriteStartArray();
-
-                writer.WriteStringValue("VonNeumann");
-
                 writer.WriteStartObject();
+                writer.WriteString("Type", "VonNeumann");
                 writer.WriteNumber("Radius", vonNeumannValue.Radius);
                 writer.WriteEndObject();
-
-                writer.WriteEndArray();
             }
 
         }

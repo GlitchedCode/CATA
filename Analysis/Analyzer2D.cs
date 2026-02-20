@@ -10,13 +10,13 @@ public class Analyzer2D
 
     public static TableRule SingleRule(Simulation.Container.Grid2D<State>[] dynamics, int statesCount)
     {
-        // TODO fanculo ci si deve rifare ad analyzer1d
+        // TODO: da implementare seguendo il pattern di Analyzer1D
         return null;
     }
 
     public static TableRule[] TimeSeries(Simulation.Container.Grid2D<State>[] dynamics, int statesCount)
     {
-        // TODO fanculo ci si deve rifare ad analyzer1d
+        // TODO: da implementare seguendo il pattern di Analyzer1D
         return null;
     }
 
