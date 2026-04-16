@@ -1,57 +1,43 @@
-﻿using Simulation;
-using Plotly.NET.LayoutObjects;
-using Plotly.NET.ImageExport;
-using Plotly.NET;
-using Plotly.NET.CSharp;
+using Simulation;
+using Visualization;
 
-class WolframDemoProgram {
+// Usage: WolframDemo [--rule <number>] [--steps <count>] [--cells <count>] [--output <path>]
+// Generates a 1D Wolfram elementary CA simulation image.
 
-  static void Main(string[] args) {
-    var space = new Simulation.Container.Array<State>(300, new State(1, 0));
-    var simulation = new Model<Simulation.Container.Array<State>>(space);
-    var rule = new WolframRule(30);
-    simulation.Rule = rule;
-    simulation.Randomize();
-    
-    var states = new List<Simulation.State[]>();
-    states.Add(simulation.CurrentState.ToArray());
-    for (int i = 0; i < 300; i++) {
-      Console.WriteLine(i);
-      simulation.Advance();
-      states.Add(simulation.CurrentState.ToArray());
+int ruleNumber = 30;
+int steps = 300;
+int cells = 300;
+string outputPath = $"results/wolfram_30";
+
+for (int i = 0; i < args.Length; i++)
+{
+    if (args[i] == "--rule" && i + 1 < args.Length)
+    {
+        ruleNumber = int.Parse(args[++i]);
+        outputPath = $"results/wolfram_{ruleNumber}";
     }
-
-    var mat = new List<float[]>();
-    states.Reverse();
-
-    foreach (var s in states)
-      mat.Add(s.Select((state) => (float)state.Value / ((float)rule.CurrentRule.StatesCount-1)).ToArray());
-  
-    var axis = new LinearAxis();
-    axis.SetValue("showbackground", false);
-    axis.SetValue("showspikes", false);
-    axis.SetValue("showline", false);
-    axis.SetValue("showgrid", false);
-    axis.SetValue("showticklabels", false);
-    axis.SetValue("showexponent", false);
-    axis.SetValue("showdividers", false);
-    axis.SetValue("showtickprefix", false);
-    axis.SetValue("showticksuffix", false);
-
-    var layout = new Layout();
-    layout.SetValue("xaxis", axis);
-    layout.SetValue("yaxis", axis);
-    layout.SetValue("showlegend", false);
-    
-    Plotly.NET.CSharp.Chart.Heatmap<float, int, int, string>(
-        zData: mat.ToArray(),
-        ShowLegend: false,
-        ShowScale: false, 
-        XGap: 10,
-        YGap: 10
-        )
-      .WithLayout(layout)
-      .SavePNG("test", Width: 1600, Height: 1600);
-
-  }
+    else if (args[i] == "--steps" && i + 1 < args.Length)
+        steps = int.Parse(args[++i]);
+    else if (args[i] == "--cells" && i + 1 < args.Length)
+        cells = int.Parse(args[++i]);
+    else if (args[i] == "--output" && i + 1 < args.Length)
+        outputPath = args[++i];
 }
+
+var space = new Simulation.Container.Array<State>(cells, new State(1, 0));
+var simulation = new Model<Simulation.Container.Array<State>>(space);
+var rule = new WolframRule(ruleNumber);
+simulation.Rule = rule;
+simulation.Randomize();
+
+var stepStates = new List<State[]>();
+stepStates.Add(simulation.CurrentState.ToArray());
+for (int i = 0; i < steps; i++)
+{
+    simulation.Advance();
+    stepStates.Add(simulation.CurrentState.ToArray());
+}
+
+Console.WriteLine($"Saving {outputPath}.png ...");
+ChartHelper.SaveHeatmap(stepStates, rule.StatesCount, outputPath);
+Console.WriteLine("Done.");

@@ -15,10 +15,15 @@ public class Analyzer1D
 
     public static TableRule SingleRule(Simulation.Container.Array<State>[] dynamics, Params paramsObj)
     {
+        if (paramsObj.StatesCount < 2)
+            throw new ArgumentException("StatesCount must be at least 2", nameof(paramsObj));
+
         if (dynamics.Length < paramsObj.LookBackAmount + 4)
             throw new Exception("too few simulation states");
 
         var cellCount = dynamics[0].CellCount;
+        if (dynamics.Any(d => d.CellCount != cellCount))
+            throw new ArgumentException("all dynamics frames must have the same CellCount", nameof(dynamics));
 
         TableRule ret = null;
 
@@ -52,9 +57,10 @@ public class Analyzer1D
 
     public static TableRule[] TimeSeries(Simulation.Container.Array<State>[] dynamics, Params paramsObj)
     {
-        var ret = new TableRule[dynamics.Length - 1 - paramsObj.LookBackAmount];
+        int count = Math.Max(0, dynamics.Length - (int)paramsObj.LookBackAmount - 4);
+        var ret = new TableRule[count];
 
-        for (int i = 0; i < dynamics.Length - paramsObj.LookBackAmount - 4; ++i)
+        for (int i = 0; i < count; ++i)
         {
             var segment = new ArraySegment<Simulation.Container.Array<State>>
                 (dynamics, i, (int)paramsObj.LookBackAmount + 4);

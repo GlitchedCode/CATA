@@ -11,12 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Simulation\Simulation.csproj" />
-    <ProjectReference Include="..\..\Analysis\Analysis.csproj" />
-    <ProjectReference Include="..\..\Visualization\Visualization.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Melanchall.DryWetMidi" Version="7.0.1" />
   </ItemGroup>
 
 </Project>

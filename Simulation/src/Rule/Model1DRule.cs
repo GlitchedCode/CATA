@@ -55,5 +55,8 @@ public class Model1DRule : MetaRule
   public void SetInnerNeighborhood(Neighborhood v) => simRule.Neighborhood = v;
   public override void Advance() => simulation.Advance();
   public void Randomize() => simulation.Randomize();
+  public void Randomize(Random rng) => simulation.Randomize(rng);
+  public int InnerCellCount => simulation.CurrentState.CellCount;
+  public void SetInnerCell(int index, State state) => simulation.Set(index, state);
   public override Rule GetCurrentRule(int position) => simRule;
 }

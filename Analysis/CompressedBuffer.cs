@@ -1,13 +1,20 @@
 using Simulation.Container;
 using Simulation;
 
-class CompressedBuffer
+namespace Analysis;
+
+public class CompressedBuffer
 {
     readonly CompressionRule rule;
     readonly Array<State>[] startingBuffer;
     readonly State sparseDefault = new State(1, 0);
     readonly int generationLength;
     readonly int lookback;
+
+    public int RuleCount       => rule.RuleCount;
+    public int SegmentCount    => rule.SegmentCount;
+    public long PathBitCount   => rule.PathBitCount;
+    public int OriginalBitCount => generationLength + lookback + 1;
 
 
     (int count, TableRule rule) Analyze(List<Array<State>> dynamics)
@@ -18,8 +25,10 @@ class CompressedBuffer
         int count = 0;
         while (dynamics.Count > lookback + 1)
         {
+            // Radius1D.Get expects states in newest-first order (states[0] = most recent).
+            // dynamics is in oldest-first order, so reverse the window before passing.
             var neighborhood = rule.Neighborhood
-                .Get(dynamics.Take(lookback + 1).ToArray(), 0);
+                .Get(dynamics.Take(lookback + 1).Reverse().ToArray(), 0);
             var expected = dynamics[lookback + 1].Get(0).Value;
 
             if (rule.Contains(neighborhood))
@@ -91,12 +100,14 @@ class CompressedBuffer
                 }
 
                 if(same)
-                {
                     master.Set(config, dist[0] == 1 ? 0 : 1);
-                    rule.Unset(config);
-                }
             }
         }
+
+        // Merge master into every sub-rule so each sub-rule is self-contained
+        // during decompression (CompressionRule.GetCurrentRule returns sub-rules only).
+        for (int i = 0; i < rules.Count; i++)
+            rules[i] = rules[i] + master;
 
         rule = new Simulation.CompressionRule(master, rules.ToArray(), offsetTable);
         //rule.Optimize();
@@ -152,7 +163,7 @@ class CompressedBuffer
         for (int i = 0; i < generationLength; i++)
         {
             model.Advance();  // model.Advance() already calls rule.Advance() internally
-            ret.Add(space.Get(0).Value == 1);
+            ret.Add(model.CurrentState.Get(0).Value == 1);
         }
 
         return ret.ToArray();

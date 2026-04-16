@@ -21,7 +21,9 @@ public class Moore : Neighborhood2D
 
     public override State[] Get(Container.Array<State>[] states, int index)
     {
-      var grids = states.Select(state => new Container.Grid2D<State>(Rows, Columns, state));
+      // Avoid copying: if states are already Grid2D, cast directly.
+      var grids = states.Select(state =>
+          state as Container.Grid2D<State> ?? new Container.Grid2D<State>(Rows, Columns, state));
       return Get(grids.ToArray(), GetRowFromKey(index), GetColumnFromKey(index));
     }
 

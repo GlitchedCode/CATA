@@ -52,10 +52,10 @@ public class Model<Space> where Space : Container.Array<State>
         UpdateMask.Advance();
     }
 
-    public void Randomize()
-    {
-        Random rng = new Random();
+    public void Randomize() => Randomize(new Random());
 
+    public void Randomize(Random rng)
+    {
         for (int i = 0; i < CurrentState.CellCount; ++i)
             CurrentState.Set(i, new State(Rule.CurrentRule.BitsCount, rng.Next(Rule.CurrentRule.StatesCount)));
     }
@@ -73,10 +73,18 @@ public class Model<Space> where Space : Container.Array<State>
             Set(i, getState(i));
     }
 
+    /// <summary>
+    /// Resets the simulation to a known state with a given history.
+    /// <paramref name="states"/> must be in chronological order (oldest first, newest last).
+    /// The last element becomes the current state; all prior elements become the history
+    /// (stored internally in newest-first order, matching the convention used by Advance).
+    /// </summary>
     public void ResetHistory(IEnumerable<Container.Array<State>> states)
     {
-        stateHistory = new(states.Take(states.Count() - 1));
-        ResetState(states.Last());
+        var list = states.ToList();
+        // Store history in newest-first order to match what Advance() builds.
+        stateHistory = new(list.Take(list.Count - 1).AsEnumerable().Reverse());
+        ResetState(list.Last());
     }
 
     public void Resize(int cellCount)

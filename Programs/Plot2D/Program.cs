@@ -1,79 +1,81 @@
-﻿using Simulation;
-using Plotly.NET.CSharp;
-using Plotly.NET.ImageExport;
-using System.IO;
+using Simulation;
+using Simulation.Container;
+using Visualization;
 
-class Plot2DProgram
+// Usage: Plot2D [--steps <count>] [--size <n>] [--output <path>]
+// Generates a Game of Life simulation image (last step mosaic).
+
+int steps = 100;
+int size = 100;
+string outputPath = "results/gol";
+
+for (int i = 0; i < args.Length; i++)
 {
-  void SaveStateToPNG(string path, int[][] zData)
-  {
+    if (args[i] == "--steps" && i + 1 < args.Length)
+        steps = int.Parse(args[++i]);
+    else if (args[i] == "--size" && i + 1 < args.Length)
+        size = int.Parse(args[++i]);
+    else if (args[i] == "--output" && i + 1 < args.Length)
+        outputPath = args[++i];
+}
 
-  }
+var space = new Grid2D<State>(size, size, new State(1, 0));
+var simulation = new Model<Grid2D<State>>(space);
 
-  static void Main(string[] args)
-  {
-    // var tmpDir = Path.GetTempPath() + "/cata/";
-    var tmpDir = "./cata/";
-    try { Directory.Delete(tmpDir, true); } catch { }
-    Directory.CreateDirectory(tmpDir);
+var neighborhood = new Moore(1);
+neighborhood.Rows = size;
+neighborhood.Columns = size;
 
-    var space = new Simulation.Container.Grid2D<State>(100, 100, new State(1, 0));
-    var simulation = new Model<Simulation.Container.Grid2D<State>>(space);
-  
-    var neighborhood = new Moore(1);
-    neighborhood.Rows = 100;
-    neighborhood.Columns = 100;
-    Console.WriteLine(neighborhood.Count());
-    var lifeRule = new TotalisticRule(2, neighborhood, true);
-    var two = new State[] { 
-      new State(1, 1), 
-      new State(1, 1),
-      new State(1, 1), // 2
-      new State(1, 0), 
-      new State(1, 0),
-      new State(1, 0),
-      new State(1, 0),
-      new State(1, 0),
-      new State(1, 0),
+// Outer-totalistic Game of Life: B3 / S23
+var lifeRule = new TotalisticRule(2, neighborhood, outer: true);
 
-    };
-    var three = new State[] { 
-      new State(1, 0), 
-      new State(1, 1),
-      new State(1, 1),
-      new State(1, 1), // 3
-      new State(1, 0),
-      new State(1, 0),
-      new State(1, 0),
-      new State(1, 0),
-      new State(1, 0),
-    };
+// Dead center: born with 3 live neighbours
+lifeRule.Increment(BuildConfig(centerAlive: false, neighborSum: 3), 1);
+// Alive center: survives with 2 or 3 live neighbours
+lifeRule.Increment(BuildConfig(centerAlive: true, neighborSum: 2), 1);
+lifeRule.Increment(BuildConfig(centerAlive: true, neighborSum: 3), 1);
 
-    // B3
-    lifeRule.Increment(three, 1);
-    // S23
-    three[0].Value = 1;
-    lifeRule.Increment(two, 1);
-    lifeRule.Increment(three, 1);
+simulation.Rule = lifeRule;
+simulation.Randomize();
 
-    simulation.Rule = lifeRule;
-    simulation.Randomize();
+var stepStates = new List<State[]>();
+stepStates.Add(Flatten(simulation.CurrentState, size));
+for (int i = 0; i < steps; i++)
+{
+    Console.WriteLine($"Step {i + 1}/{steps}");
+    simulation.Advance();
+    stepStates.Add(Flatten(simulation.CurrentState, size));
+}
 
-    {
-      var stateMat = simulation.CurrentState.ToMatrix();
-      var floatMat = stateMat.Select(r => r.Select(s => (float)s.Value));
-      Chart.Heatmap<float,int,int,string>(zData:floatMat).SavePNG(tmpDir + "0");
-    }
-    for (int i = 1; i <= 100; i++)
-    {
-      Console.WriteLine("Step " + i);
-      simulation.Advance();
-      Console.WriteLine("Step " + i + " done");
-      var stateMat = simulation.CurrentState.ToMatrix();
-      var floatMat = stateMat.Select(r => r.Select(s => (float)s.Value));
-      Chart.Heatmap<float,int,int,string>(zData:floatMat).SavePNG(tmpDir + i);
-    }
+// Save final state as a 2D heatmap
+var finalMatrix = simulation.CurrentState
+    .ToMatrix()
+    .Select(row => row.Select(s => (float)s.Value).ToArray())
+    .ToArray();
 
-    simulation.Randomize();
-  }
+Console.WriteLine($"Saving {outputPath}.png ...");
+ChartHelper.SaveHeatmap(finalMatrix, outputPath);
+Console.WriteLine("Done.");
+
+// ---- helpers ----
+
+static State[] Flatten(Grid2D<State> grid, int size)
+{
+    var rows = new List<State>();
+    for (int r = 0; r < size; r++)
+        for (int c = 0; c < size; c++)
+            rows.Add(grid.Get(r, c));
+    return rows.ToArray();
+}
+
+static State[] BuildConfig(bool centerAlive, int neighborSum)
+{
+    // Outer-totalistic: first element = center, rest = uniform representation of sum
+    // TotalisticRule with outerTotalistic=true uses (center, sum) as key
+    var center = new State(1, centerAlive ? 1 : 0);
+    var neighbors = Enumerable.Range(0, neighborSum)
+        .Select(_ => new State(1, 1))
+        .Concat(Enumerable.Range(0, 8 - neighborSum).Select(_ => new State(1, 0)))
+        .ToArray();
+    return new[] { center }.Concat(neighbors).ToArray();
 }

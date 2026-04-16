@@ -34,12 +34,24 @@ public class TotalisticRule : Rule
   }
   
   int idx(State[] configuration) {
-    var cfg = Outer ? configuration.Skip(1) : configuration;
-    var idx = 0;
-    foreach(var state in cfg)
-      idx += state.Value;
+    if (!Outer)
+    {
+      var sum = 0;
+      foreach (var state in configuration)
+        sum += state.Value;
+      return sum;
+    }
 
-    return Outer ? idx * (configuration[0].Value + 1) : idx;
+    // Outer-totalistic: unique key = center * (maxNeighborSum + 1) + neighborSum.
+    // The old formula  sum * (center + 1)  had collisions, e.g.
+    //   dead+4 live → 4*(0+1)=4  ==  alive+2 live → 2*(1+1)=4.
+    // The new formula avoids collisions for any binary neighborhood.
+    var neighborSum = 0;
+    for (int i = 1; i < configuration.Length; i++)
+      neighborSum += configuration[i].Value;
+
+    int maxNeighborSum = (configuration.Length - 1) * (_StatesCount - 1);
+    return configuration[0].Value * (maxNeighborSum + 1) + neighborSum;
   }
 
   public void Set(State[] configuration, double[] distribution) {
