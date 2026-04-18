@@ -11,13 +11,17 @@ public class Array<T> : ICloneable
 
   public readonly T DefaultValue;
 
-  public Array(int cellCount, T sparseDefault)
+  public BoundaryCondition BoundaryCondition { get; set; } = BoundaryCondition.Fixed;
+
+  public Array(int cellCount, T sparseDefault,
+               BoundaryCondition boundary = BoundaryCondition.Fixed)
   {
     if (cellCount < 0)
       throw new Exception("Invalid cell count");
 
     this.CellCount = cellCount;
     this.DefaultValue = sparseDefault;
+    this.BoundaryCondition = boundary;
 
     map = new(4, cellCount);
 
@@ -28,6 +32,7 @@ public class Array<T> : ICloneable
   {
     DefaultValue = other.DefaultValue;
     CellCount = other.CellCount;
+    BoundaryCondition = other.BoundaryCondition;
 
     map = new ConcurrentDictionary<int, T>(other.map);
     Resize(CellCount);
@@ -49,12 +54,33 @@ public class Array<T> : ICloneable
     this.CellCount = cellCount;
   }
 
+  // Risolve un indice eventualmente fuori range secondo la BoundaryCondition.
+  // Restituisce -1 se Fixed e l'indice è fuori range.
+  private int ResolveIndex(int index)
+  {
+    if (index >= 0 && index < CellCount) return index;
+    return BoundaryCondition switch
+    {
+      BoundaryCondition.Periodic   => ((index % CellCount) + CellCount) % CellCount,
+      BoundaryCondition.Reflective => ReflectIndex(index, CellCount),
+      _                            => -1,
+    };
+  }
+
+  // Rispecchia l'indice i attorno ai bordi [0, n-1].
+  protected static int ReflectIndex(int i, int n)
+  {
+    if (n <= 1) return 0;
+    int period = 2 * (n - 1);
+    i = ((i % period) + period) % period;
+    return i < n ? i : period - i;
+  }
+
   public T Get(int index)
   {
-    if(map.ContainsKey(index))
-      return map[index];
-    else
-      return DefaultValue;
+    int resolved = ResolveIndex(index);
+    if (resolved < 0) return DefaultValue;
+    return map.TryGetValue(resolved, out var v) ? v : DefaultValue;
   }
 
   public void Set(int index, T element)
@@ -71,12 +97,12 @@ public class Array<T> : ICloneable
 
 
   public virtual Array<T> MakeNew() {
-    return new Array<T>(CellCount, DefaultValue);
-  } 
+    return new Array<T>(CellCount, DefaultValue, BoundaryCondition);
+  }
 
   public object Clone()
   {
-    var ret = new Array<T>(CellCount, DefaultValue);
+    var ret = new Array<T>(CellCount, DefaultValue, BoundaryCondition);
 
     foreach (var k in map.Keys)
       ret.Set(k, Get(k));

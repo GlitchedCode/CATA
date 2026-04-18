@@ -9,10 +9,11 @@ public class Grid2D<T> : Simulation.Container.Array<T>
     public int Columns { get; private set; }
 
 
-    // Initializes the ArrayList objects
-    public Grid2D(int rows, int cols, T sparseDefault) : base(rows * cols, sparseDefault)
+    public Grid2D(int rows, int cols, T sparseDefault,
+                  BoundaryCondition boundary = BoundaryCondition.Fixed)
+        : base(rows * cols, sparseDefault, boundary)
     {
-        if (rows <= 0 | cols <= 0) // sanity check
+        if (rows <= 0 | cols <= 0)
             throw new Exception("Invalid size values");
 
         this.Rows = rows;
@@ -23,7 +24,7 @@ public class Grid2D<T> : Simulation.Container.Array<T>
 
     public Grid2D(int rows, int cols, Array<T> array) : base(array)
     {
-        if (rows <= 0 | cols <= 0) // sanity check
+        if (rows <= 0 | cols <= 0)
             throw new Exception("Invalid size values");
 
         this.Rows = rows;
@@ -31,10 +32,9 @@ public class Grid2D<T> : Simulation.Container.Array<T>
         Resize(rows, cols);
     }
 
-    // Resets the minimum capacity for all the ArrayList objects
     public void Resize(int rows, int cols)
     {
-        if (rows <= 0 | cols <= 0) // sanity check
+        if (rows <= 0 | cols <= 0)
             throw new Exception("Invalid size values");
 
         Resize(rows * cols);
@@ -55,16 +55,30 @@ public class Grid2D<T> : Simulation.Container.Array<T>
         this.Columns = cols;
     }
 
+    // Applica la BoundaryCondition a una singola dimensione.
+    private int WrapDim(int idx, int max) => BoundaryCondition switch
+    {
+        BoundaryCondition.Periodic   => ((idx % max) + max) % max,
+        BoundaryCondition.Reflective => ReflectIndex(idx, max),
+        _                            => idx,   // Fixed: ritorna invariato, il bounds check è in Get
+    };
+
     // Gets element at (row, col) coordinates
     public T Get(int row, int col)
     {
-        if (row >= Rows | col >= Columns | row < 0 | col < 0)
-            return DefaultValue;
+        if (BoundaryCondition == BoundaryCondition.Fixed)
+        {
+            if (row < 0 || row >= Rows || col < 0 || col >= Columns)
+                return DefaultValue;
+            return base.Get(GetKeyFromCoords(row, col));
+        }
 
+        row = WrapDim(row, Rows);
+        col = WrapDim(col, Columns);
         return base.Get(GetKeyFromCoords(row, col));
     }
 
-    // Puts element at (row, col) coordinates
+    // Puts element at (row, col) coordinates (solo entro i bordi reali)
     public void Set(int row, int col, T element)
     {
         if (row >= Rows | col >= Columns | row < 0 | col < 0)
@@ -86,7 +100,7 @@ public class Grid2D<T> : Simulation.Container.Array<T>
         (row * Columns) + col;
 
     public override Array<T> MakeNew() =>
-        new Grid2D<T>(Rows, Columns, DefaultValue);
+        new Grid2D<T>(Rows, Columns, DefaultValue, BoundaryCondition);
 
     public T[][] ToMatrix() {
       var ret = new List<T[]>();
